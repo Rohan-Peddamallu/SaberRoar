@@ -10,6 +10,24 @@ export function AuthenticatedHome() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
   const [isUploading, setIsUploading] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Load dark mode preference from localStorage
+  useEffect(() => {
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode) {
+      setDarkMode(JSON.parse(savedMode));
+    }
+  }, []);
+
+  // Save dark mode preference to localStorage
+  useEffect(() => {
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+  }, [darkMode]);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
 
   // File upload handling
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,7 +157,7 @@ export function AuthenticatedHome() {
   const renderDashboard = () => (
     <div className="px-4 py-6 sm:px-0">
       {/* Welcome Section */}
-      <div className="overflow-hidden shadow rounded-lg mb-6" style={{ backgroundColor: '#b3a169' }}>
+      <div className={`overflow-hidden shadow rounded-lg mb-6 ${darkMode ? 'bg-gray-800' : 'bg-[#b3a169]'}`}>
         <div className="px-4 py-5 sm:p-6">
           <h2 className="text-lg leading-6 font-medium text-white mb-2">
             Welcome back, {dbUser?.name || stackUser?.displayName || "Student"}!
@@ -154,75 +172,79 @@ export function AuthenticatedHome() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div 
           onClick={() => setActivePage('upload')}
-          className="overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105" 
-          style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}
+          className={`overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105 border-2 ${
+            darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'
+          }`}
         >
           <div className="px-4 py-5 sm:p-6 text-center">
-            <div className="p-3 rounded-lg mx-auto mb-4 w-fit" style={{ backgroundColor: '#e6bf00' }}>
+            <div className="p-3 rounded-lg mx-auto mb-4 w-fit bg-[#e6bf00]">
               <svg className="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-black mb-2">Upload Footage</h3>
-            <p className="text-sm" style={{ color: '#b3a169' }}>Submit your video content</p>
+            <h3 className={`text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>Upload Footage</h3>
+            <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Submit your video content</p>
           </div>
         </div>
 
         <div 
           onClick={() => setActivePage('equipment')}
-          className="overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105" 
-          style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}
+          className={`overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105 border-2 ${
+            darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'
+          }`}
         >
           <div className="px-4 py-5 sm:p-6 text-center">
-            <div className="p-3 rounded-lg mx-auto mb-4 w-fit" style={{ backgroundColor: '#e6bf00' }}>
+            <div className="p-3 rounded-lg mx-auto mb-4 w-fit bg-[#e6bf00]">
               <svg className="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-black mb-2">Equipment</h3>
-            <p className="text-sm" style={{ color: '#b3a169' }}>Sign out cameras & gear</p>
+            <h3 className={`text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>Equipment</h3>
+            <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Sign out cameras & gear</p>
           </div>
         </div>
 
         <div 
           onClick={() => setActivePage('submissions')}
-          className="overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105" 
-          style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}
+          className={`overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105 border-2 ${
+            darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'
+          }`}
         >
           <div className="px-4 py-5 sm:p-6 text-center">
-            <div className="p-3 rounded-lg mx-auto mb-4 w-fit" style={{ backgroundColor: '#e6bf00' }}>
+            <div className="p-3 rounded-lg mx-auto mb-4 w-fit bg-[#e6bf00]">
               <svg className="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-black mb-2">Submissions</h3>
-            <p className="text-sm" style={{ color: '#b3a169' }}>Scripts & show segments</p>
+            <h3 className={`text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>Submissions</h3>
+            <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Scripts & show segments</p>
           </div>
         </div>
 
         <div 
           onClick={() => setActivePage('drive')}
-          className="overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105" 
-          style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}
+          className={`overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105 border-2 ${
+            darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'
+          }`}
         >
           <div className="px-4 py-5 sm:p-6 text-center">
-            <div className="p-3 rounded-lg mx-auto mb-4 w-fit" style={{ backgroundColor: '#e6bf00' }}>
+            <div className="p-3 rounded-lg mx-auto mb-4 w-fit bg-[#e6bf00]">
               <svg className="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-black mb-2">Google Drive</h3>
-            <p className="text-sm" style={{ color: '#b3a169' }}>Browse video library</p>
+            <h3 className={`text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>Google Drive</h3>
+            <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Browse video library</p>
           </div>
         </div>
       </div>
 
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="overflow-hidden shadow rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}>
-          <div className="px-4 py-5 sm:p-6 border-b" style={{ borderColor: '#b3a169' }}>
-            <h3 className="text-xl font-semibold text-black">Recent Activity</h3>
+        <div className={`overflow-hidden shadow rounded-lg border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
+          <div className={`px-4 py-5 sm:p-6 border-b ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
+            <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Recent Activity</h3>
           </div>
           <div className="px-4 py-5 sm:p-6 space-y-4">
             {[
@@ -230,26 +252,26 @@ export function AuthenticatedHome() {
               { action: 'Checked out Camera Kit #2', time: '1 day ago' },
               { action: 'Submitted sports interview script', time: '3 days ago' }
             ].map((activity, index) => (
-              <div key={index} className="flex justify-between items-center p-3 rounded-lg" style={{ backgroundColor: '#f8f9fa' }}>
-                <span className="text-black">{activity.action}</span>
-                <span className="text-sm" style={{ color: '#b3a169' }}>{activity.time}</span>
+              <div key={index} className={`flex justify-between items-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                <span className={`${darkMode ? 'text-white' : 'text-black'}`}>{activity.action}</span>
+                <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-[#b3a169]'}`}>{activity.time}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="overflow-hidden shadow rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}>
-          <div className="px-4 py-5 sm:p-6 border-b" style={{ borderColor: '#b3a169' }}>
-            <h3 className="text-xl font-semibold text-black">Quick Links</h3>
+        <div className={`overflow-hidden shadow rounded-lg border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
+          <div className={`px-4 py-5 sm:p-6 border-b ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
+            <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Quick Links</h3>
           </div>
           <div className="px-4 py-5 sm:p-6 space-y-4">
-            <a href="https://drive.google.com" target="_blank" rel="noopener noreferrer" className="block p-4 rounded-lg border-2 transition-all duration-200 hover:scale-105" style={{ borderColor: '#b3a169' }}>
-              <h4 className="font-medium text-black">SaberRoar Google Drive</h4>
-              <p className="text-sm" style={{ color: '#b3a169' }}>Access all video files and resources</p>
+            <a href="https://drive.google.com" target="_blank" rel="noopener noreferrer" className={`block p-4 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
+              <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>SaberRoar Google Drive</h4>
+              <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Access all video files and resources</p>
             </a>
-            <a href="mailto:mrdeane@school.edu" className="block p-4 rounded-lg border-2 transition-all duration-200 hover:scale-105" style={{ borderColor: '#b3a169' }}>
-              <h4 className="font-medium text-black">Contact Mr. Deane</h4>
-              <p className="text-sm" style={{ color: '#b3a169' }}>Questions about equipment or projects</p>
+            <a href="mailto:mrdeane@school.edu" className={`block p-4 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
+              <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>Contact Mr. Deane</h4>
+              <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Questions about equipment or projects</p>
             </a>
           </div>
         </div>
@@ -260,15 +282,15 @@ export function AuthenticatedHome() {
   const renderEquipmentPage = () => (
     <div className="px-4 py-6 sm:px-0">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-black mb-2">Equipment Management</h2>
-        <p style={{ color: '#b3a169' }}>Sign out cameras, microphones, and other broadcast equipment</p>
+        <h2 className={`text-2xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>Equipment Management</h2>
+        <p className={`${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Sign out cameras, microphones, and other broadcast equipment</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Available Equipment */}
-        <div className="overflow-hidden shadow rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}>
-          <div className="px-4 py-5 sm:p-6 border-b" style={{ borderColor: '#b3a169' }}>
-            <h3 className="text-xl font-semibold text-black">Available Equipment</h3>
+        <div className={`overflow-hidden shadow rounded-lg border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
+          <div className={`px-4 py-5 sm:p-6 border-b ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
+            <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Available Equipment</h3>
           </div>
           <div className="px-4 py-5 sm:p-6 space-y-4">
             {[
@@ -279,18 +301,18 @@ export function AuthenticatedHome() {
               { item: 'Lighting Kit #1', description: '3-point lighting setup', available: false },
               { item: 'Tripod Set #3', description: 'Heavy-duty tripods (2)', available: true }
             ].map((equipment, index) => (
-              <div key={index} className="flex items-center justify-between p-4 rounded-lg border-2" style={{ borderColor: equipment.available ? '#e6bf00' : '#b3a169' }}>
+              <div key={index} className={`flex items-center justify-between p-4 rounded-lg border-2 ${equipment.available ? 'border-[#e6bf00]' : 'border-[#b3a169]'}`}>
                 <div className="flex-1">
-                  <h4 className="font-medium text-black">{equipment.item}</h4>
-                  <p className="text-sm" style={{ color: '#b3a169' }}>{equipment.description}</p>
+                  <h4 className={`${darkMode ? 'text-white' : 'text-black'}`}>{equipment.item}</h4>
+                  <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>{equipment.description}</p>
                 </div>
                 <div className="text-right">
                   {equipment.available ? (
-                    <button className="px-4 py-2 rounded-lg text-black font-bold transition-all duration-200 hover:scale-105" style={{ backgroundColor: '#e6bf00' }}>
+                    <button className={`px-4 py-2 rounded-lg font-bold transition-all duration-200 hover:scale-105 ${darkMode ? 'text-black bg-[#e6bf00]' : 'text-black bg-[#e6bf00]'}`}>
                       Sign Out
                     </button>
                   ) : (
-                    <span className="px-4 py-2 rounded-lg text-white font-bold" style={{ backgroundColor: '#b3a169' }}>
+                    <span className={`px-4 py-2 rounded-lg font-bold ${darkMode ? 'text-white bg-[#b3a169]' : 'text-white bg-[#b3a169]'}`}>
                       Checked Out
                     </span>
                   )}
@@ -301,33 +323,33 @@ export function AuthenticatedHome() {
         </div>
 
         {/* My Equipment */}
-        <div className="overflow-hidden shadow rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}>
-          <div className="px-4 py-5 sm:p-6 border-b" style={{ borderColor: '#b3a169' }}>
-            <h3 className="text-xl font-semibold text-black">My Equipment</h3>
+        <div className={`overflow-hidden shadow rounded-lg border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
+          <div className={`px-4 py-5 sm:p-6 border-b ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
+            <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>My Equipment</h3>
           </div>
           <div className="px-4 py-5 sm:p-6 space-y-4">
             {[
               { item: 'Camera Kit #3', checkedOut: '3 days ago', dueDate: 'Tomorrow' },
               { item: 'Microphone Set C', checkedOut: '1 week ago', dueDate: 'Friday' }
             ].map((equipment, index) => (
-              <div key={index} className="flex items-center justify-between p-4 rounded-lg border-2" style={{ borderColor: '#b3a169' }}>
+              <div key={index} className={`flex items-center justify-between p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
                 <div className="flex-1">
-                  <h4 className="font-medium text-black">{equipment.item}</h4>
-                  <p className="text-sm" style={{ color: '#b3a169' }}>Checked out: {equipment.checkedOut}</p>
+                  <h4 className={`${darkMode ? 'text-white' : 'text-black'}`}>{equipment.item}</h4>
+                  <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Checked out: {equipment.checkedOut}</p>
                   <p className="text-sm font-medium text-red-600">Due: {equipment.dueDate}</p>
                 </div>
-                <button className="px-4 py-2 rounded-lg text-white font-bold transition-all duration-200 hover:scale-105" style={{ backgroundColor: '#b3a169' }}>
+                <button className={`px-4 py-2 rounded-lg font-bold transition-all duration-200 hover:scale-105 ${darkMode ? 'text-white bg-[#b3a169]' : 'text-white bg-[#b3a169]'}`}>
                   Return
                 </button>
               </div>
             ))}
             {/* Request Form */}
-            <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: '#f8f9fa', border: '2px solid #e6bf00' }}>
-              <h4 className="font-semibold text-black mb-4">Request Equipment</h4>
+            <div className={`mt-6 p-4 rounded-lg ${darkMode ? 'bg-gray-700 border-[#e6bf00]' : 'bg-gray-50 border-[#e6bf00]'}`}>
+              <h4 className={`${darkMode ? 'text-white' : 'text-black'} font-semibold mb-4`}>Request Equipment</h4>
               <form className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-black mb-1">Equipment Needed</label>
-                  <select className="w-full p-2 border-2 rounded-lg" style={{ borderColor: '#b3a169' }}>
+                  <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Equipment Needed</label>
+                  <select className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`}>
                     <option>Select equipment...</option>
                     <option>Camera Kit</option>
                     <option>Microphone Set</option>
@@ -336,20 +358,20 @@ export function AuthenticatedHome() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-black mb-1">Project Description</label>
-                  <textarea className="w-full p-2 border-2 rounded-lg" rows={3} style={{ borderColor: '#b3a169' }} placeholder="Describe what you'll be filming..."></textarea>
+                  <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Project Description</label>
+                  <textarea className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} rows={3} placeholder="Describe what you'll be filming..."></textarea>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-black mb-1">Start Date</label>
-                    <input type="date" className="w-full p-2 border-2 rounded-lg" style={{ borderColor: '#b3a169' }} />
+                    <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Start Date</label>
+                    <input type="date" className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-black mb-1">Return Date</label>
-                    <input type="date" className="w-full p-2 border-2 rounded-lg" style={{ borderColor: '#b3a169' }} />
+                    <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Return Date</label>
+                    <input type="date" className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} />
                   </div>
                 </div>
-                <button type="submit" className="w-full px-4 py-2 rounded-lg text-black font-bold transition-all duration-200 hover:scale-105" style={{ backgroundColor: '#e6bf00' }}>
+                <button type="submit" className={`w-full px-4 py-2 rounded-lg font-bold transition-all duration-200 hover:scale-105 ${darkMode ? 'text-black bg-[#e6bf00]' : 'text-black bg-[#e6bf00]'}`}>
                   Submit Request
                 </button>
               </form>
@@ -363,25 +385,24 @@ export function AuthenticatedHome() {
   const renderUploadPage = () => (
     <div className="px-4 py-6 sm:px-0">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-black mb-2">Upload Footage</h2>
-        <p style={{ color: '#b3a169' }}>Submit your video content for review and editing</p>
+        <h2 className={`text-2xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>Upload Footage</h2>
+        <p className={`${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Submit your video content for review and editing</p>
       </div>
 
       <div className="max-w-4xl mx-auto">
-        <div className="overflow-hidden shadow rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}>
+        <div className={`overflow-hidden shadow rounded-lg border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
           <div className="px-4 py-5 sm:p-6">
             {/* File Upload Area */}
             <div 
-              className="border-2 border-dashed rounded-lg p-12 text-center transition-colors duration-200 hover:border-solid"
-              style={{ borderColor: '#b3a169' }}
+              className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors duration-200 hover:border-solid ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}
               onDrop={handleDrop}
               onDragOver={handleDragOver}
             >
               <svg className="mx-auto h-16 w-16 mb-4" style={{ color: '#e6bf00' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
-              <p className="text-xl font-medium text-black mb-2">Drop your files here</p>
-              <p className="text-sm mb-4" style={{ color: '#b3a169' }}>or click to browse</p>
+              <p className={`text-xl font-medium mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>Drop your files here</p>
+              <p className={`text-sm mb-4 ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>or click to browse</p>
               
               {/* Hidden file input */}
               <input
@@ -395,8 +416,7 @@ export function AuthenticatedHome() {
               
               <label 
                 htmlFor="file-upload"
-                className="inline-block px-8 py-3 rounded-lg text-black font-bold transition-all duration-200 hover:scale-105 cursor-pointer"
-                style={{ backgroundColor: '#e6bf00' }}
+                className={`inline-block px-8 py-3 rounded-lg font-bold transition-all duration-200 hover:scale-105 cursor-pointer ${darkMode ? 'text-black bg-[#e6bf00]' : 'text-black bg-[#e6bf00]'}`}
               >
                 Choose Files
               </label>
@@ -405,13 +425,13 @@ export function AuthenticatedHome() {
             {/* Selected Files Display */}
             {selectedFiles.length > 0 && (
               <div className="mt-6">
-                <h4 className="font-semibold text-black mb-4">Selected Files ({selectedFiles.length})</h4>
+                <h4 className={`font-semibold mb-4 ${darkMode ? 'text-white' : 'text-black'}`}>Selected Files ({selectedFiles.length})</h4>
                 <div className="space-y-3">
                   {selectedFiles.map((file, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 rounded-lg border-2" style={{ borderColor: '#b3a169' }}>
+                    <div key={index} className={`flex items-center justify-between p-3 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
                       <div className="flex-1">
-                        <p className="font-medium text-black">{file.name}</p>
-                        <p className="text-sm" style={{ color: '#b3a169' }}>
+                        <p className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>{file.name}</p>
+                        <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>
                           {(file.size / (1024 * 1024)).toFixed(2)} MB
                         </p>
                         {uploadProgress[file.name] !== undefined && (
@@ -425,7 +445,7 @@ export function AuthenticatedHome() {
                                 }}
                               ></div>
                             </div>
-                            <p className="text-xs mt-1" style={{ color: '#b3a169' }}>
+                            <p className={`text-xs mt-1 ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>
                               {Math.round(uploadProgress[file.name])}% uploaded
                             </p>
                           </div>
@@ -434,8 +454,7 @@ export function AuthenticatedHome() {
                       {!isUploading && (
                         <button
                           onClick={() => removeFile(index)}
-                          className="ml-4 px-3 py-1 rounded text-white hover:opacity-80"
-                          style={{ backgroundColor: '#b3a169' }}
+                          className={`ml-4 px-3 py-1 rounded hover:opacity-80 ${darkMode ? 'text-white bg-[#b3a169]' : 'text-white bg-[#b3a169]'}`}
                         >
                           Remove
                         </button>
@@ -448,23 +467,23 @@ export function AuthenticatedHome() {
             
             <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <h4 className="font-semibold text-black mb-4">File Information</h4>
+                <h4 className={`font-semibold mb-4 ${darkMode ? 'text-white' : 'text-black'}`}>File Information</h4>
                 <form className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-black mb-1">Project Title</label>
-                    <input type="text" className="w-full p-2 border-2 rounded-lg" style={{ borderColor: '#b3a169' }} placeholder="e.g., Morning Announcements 11/15" />
+                    <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Project Title</label>
+                    <input type="text" className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} placeholder="e.g., Morning Announcements 11/15" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-black mb-1">Description</label>
-                    <textarea className="w-full p-2 border-2 rounded-lg" rows={3} style={{ borderColor: '#b3a169' }} placeholder="Brief description of the content..."></textarea>
+                    <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Description</label>
+                    <textarea className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} rows={3} placeholder="Brief description of the content..."></textarea>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-black mb-1">Date Filmed</label>
-                    <input type="date" className="w-full p-2 border-2 rounded-lg" style={{ borderColor: '#b3a169' }} />
+                    <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Date Filmed</label>
+                    <input type="date" className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-black mb-1">Category</label>
-                    <select className="w-full p-2 border-2 rounded-lg" style={{ borderColor: '#b3a169' }}>
+                    <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Category</label>
+                    <select className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`}>
                       <option>Select category...</option>
                       <option>Morning Announcements</option>
                       <option>Sports</option>
@@ -477,31 +496,31 @@ export function AuthenticatedHome() {
               </div>
               
               <div>
-                <h4 className="font-semibold text-black mb-4">Upload Guidelines</h4>
+                <h4 className={`font-semibold mb-4 ${darkMode ? 'text-white' : 'text-black'}`}>Upload Guidelines</h4>
                 <div className="space-y-3">
                   <div className="flex items-start">
                     <svg className="h-5 w-5 mt-0.5 mr-2" style={{ color: '#e6bf00' }} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-sm" style={{ color: '#b3a169' }}>Maximum file size: 2GB per file</span>
+                    <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Maximum file size: 2GB per file</span>
                   </div>
                   <div className="flex items-start">
                     <svg className="h-5 w-5 mt-0.5 mr-2" style={{ color: '#e6bf00' }} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-sm" style={{ color: '#b3a169' }}>Accepted formats: MP4, MOV, AVI</span>
+                    <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Accepted formats: MP4, MOV, AVI</span>
                   </div>
                   <div className="flex items-start">
                     <svg className="h-5 w-5 mt-0.5 mr-2" style={{ color: '#e6bf00' }} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-sm" style={{ color: '#b3a169' }}>Include project name in filename</span>
+                    <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Include project name in filename</span>
                   </div>
                   <div className="flex items-start">
                     <svg className="h-5 w-5 mt-0.5 mr-2" style={{ color: '#e6bf00' }} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-sm" style={{ color: '#b3a169' }}>Files are automatically saved to Google Drive</span>
+                    <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Files are automatically saved to Google Drive</span>
                   </div>
                 </div>
                 
@@ -530,20 +549,20 @@ export function AuthenticatedHome() {
   const renderSubmissionsPage = () => (
     <div className="px-4 py-6 sm:px-0">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-black mb-2">Submissions</h2>
-        <p style={{ color: '#b3a169' }}>Submit scripts, project ideas, and track your submissions</p>
+        <h2 className={`text-2xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>Submissions</h2>
+        <p className={`${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Submit scripts, project ideas, and track your submissions</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="overflow-hidden shadow rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}>
-          <div className="px-4 py-5 sm:p-6 border-b" style={{ borderColor: '#b3a169' }}>
-            <h3 className="text-xl font-semibold text-black">Submit New Content</h3>
+        <div className={`overflow-hidden shadow rounded-lg border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
+          <div className={`px-4 py-5 sm:p-6 border-b ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
+            <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Submit New Content</h3>
           </div>
           <div className="px-4 py-5 sm:p-6">
             <form className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-black mb-1">Submission Type</label>
-                <select className="w-full p-2 border-2 rounded-lg" style={{ borderColor: '#b3a169' }}>
+                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Submission Type</label>
+                <select className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`}>
                   <option>Select type...</option>
                   <option>Script</option>
                   <option>Project Idea</option>
@@ -552,27 +571,27 @@ export function AuthenticatedHome() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-black mb-1">Title</label>
-                <input type="text" className="w-full p-2 border-2 rounded-lg" style={{ borderColor: '#b3a169' }} placeholder="Title of your submission..." />
+                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Title</label>
+                <input type="text" className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} placeholder="Title of your submission..." />
               </div>
               <div>
-                <label className="block text-sm font-medium text-black mb-1">Content</label>
-                <textarea className="w-full p-2 border-2 rounded-lg" rows={6} style={{ borderColor: '#b3a169' }} placeholder="Enter your script, idea, or content here..."></textarea>
+                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Content</label>
+                <textarea className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} rows={6} placeholder="Enter your script, idea, or content here..."></textarea>
               </div>
               <div>
-                <label className="block text-sm font-medium text-black mb-1">Additional Notes</label>
-                <textarea className="w-full p-2 border-2 rounded-lg" rows={3} style={{ borderColor: '#b3a169' }} placeholder="Any additional information..."></textarea>
+                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Additional Notes</label>
+                <textarea className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} rows={3} placeholder="Any additional information..."></textarea>
               </div>
-              <button type="submit" className="w-full px-4 py-2 rounded-lg text-black font-bold transition-all duration-200 hover:scale-105" style={{ backgroundColor: '#e6bf00' }}>
+              <button type="submit" className={`w-full px-4 py-2 rounded-lg font-bold transition-all duration-200 hover:scale-105 ${darkMode ? 'text-black bg-[#e6bf00]' : 'text-black bg-[#e6bf00]'}`}>
                 Submit for Review
               </button>
             </form>
           </div>
         </div>
 
-        <div className="overflow-hidden shadow rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}>
-          <div className="px-4 py-5 sm:p-6 border-b" style={{ borderColor: '#b3a169' }}>
-            <h3 className="text-xl font-semibold text-black">My Submissions</h3>
+        <div className={`overflow-hidden shadow rounded-lg border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
+          <div className={`px-4 py-5 sm:p-6 border-b ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
+            <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>My Submissions</h3>
           </div>
           <div className="px-4 py-5 sm:p-6 space-y-4">
             {[
@@ -580,11 +599,11 @@ export function AuthenticatedHome() {
               { title: 'Sports Segment Video', type: 'Show Segment', date: '1 week ago', status: 'Under Review', feedback: null },
               { title: 'Interview Questions - Principal', type: 'Interview Questions', date: '2 weeks ago', status: 'Approved', feedback: 'Excellent questions!' }
             ].map((submission, index) => (
-              <div key={index} className="p-4 rounded-lg border-2" style={{ borderColor: '#b3a169' }}>
+              <div key={index} className={`p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
-                    <h4 className="font-medium text-black">{submission.title}</h4>
-                    <p className="text-sm" style={{ color: '#b3a169' }}>{submission.type} • {submission.date}</p>
+                    <h4 className={`${darkMode ? 'text-white' : 'text-black'}`}>{submission.title}</h4>
+                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>{submission.type} • {submission.date}</p>
                   </div>
                   <span className={`px-3 py-1 text-xs font-medium rounded-full ${
                     submission.status === 'Approved' 
@@ -597,8 +616,8 @@ export function AuthenticatedHome() {
                   </span>
                 </div>
                 {submission.feedback && (
-                  <div className="mt-2 p-2 rounded" style={{ backgroundColor: '#f8f9fa' }}>
-                    <p className="text-sm" style={{ color: '#b3a169' }}>
+                  <div className={`mt-2 p-2 rounded ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>
                       <strong>Feedback:</strong> {submission.feedback}
                     </p>
                   </div>
@@ -614,8 +633,8 @@ export function AuthenticatedHome() {
   const renderDrivePage = () => (
     <div className="px-4 py-6 sm:px-0">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-black mb-2">Google Drive Library</h2>
-        <p style={{ color: '#b3a169' }}>Browse and access all SaberRoar video files and resources</p>
+        <h2 className={`text-2xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>Google Drive Library</h2>
+        <p className={`${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Browse and access all SaberRoar video files and resources</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -627,17 +646,17 @@ export function AuthenticatedHome() {
           { name: 'Templates & Scripts', count: '18 files', updated: '1 week ago' },
           { name: 'Raw Footage', count: '67 videos', updated: '1 day ago' }
         ].map((folder, index) => (
-          <div key={index} className="overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105" style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}>
+          <div key={index} className={`overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105 border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
             <div className="px-4 py-5 sm:p-6 text-center">
-              <div className="p-4 rounded-lg mx-auto mb-4 w-fit" style={{ backgroundColor: '#e6bf00' }}>
+              <div className="p-4 rounded-lg mx-auto mb-4 w-fit bg-[#e6bf00]">
                 <svg className="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-black mb-2">{folder.name}</h3>
-              <p className="text-sm mb-1" style={{ color: '#b3a169' }}>{folder.count}</p>
-              <p className="text-xs" style={{ color: '#b3a169' }}>Updated {folder.updated}</p>
+              <h3 className={`text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>{folder.name}</h3>
+              <p className={`text-sm mb-1 ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>{folder.count}</p>
+              <p className={`text-xs ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Updated {folder.updated}</p>
             </div>
           </div>
         ))}
@@ -648,8 +667,7 @@ export function AuthenticatedHome() {
           href="https://drive.google.com" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="inline-flex items-center px-6 py-3 rounded-lg text-black font-bold transition-all duration-200 hover:scale-105" 
-          style={{ backgroundColor: '#e6bf00' }}
+          className={`inline-flex items-center px-6 py-3 rounded-lg font-bold transition-all duration-200 hover:scale-105 ${darkMode ? 'text-black bg-[#e6bf00]' : 'text-black bg-[#e6bf00]'}`}
         >
           <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -676,9 +694,9 @@ export function AuthenticatedHome() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#ffffff' }}>
+    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-white'}`}>
       {/* Header */}
-      <header className="shadow" style={{ backgroundColor: '#b3a169' }}>
+      <header className={`shadow transition-colors duration-300 ${darkMode ? 'bg-gray-800' : 'bg-[#b3a169]'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
@@ -687,6 +705,26 @@ export function AuthenticatedHome() {
               </h1>
             </div>
             <div className="flex items-center gap-4">
+              {/* Dark Mode Toggle */}
+              <button
+                onClick={toggleDarkMode}
+                className={`p-2 rounded-lg transition-colors duration-200 ${
+                  darkMode 
+                    ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600' 
+                    : 'bg-white/20 text-white hover:bg-white/30'
+                }`}
+                aria-label="Toggle dark mode"
+              >
+                {darkMode ? (
+                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+                  </svg>
+                ) : (
+                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                  </svg>
+                )}
+              </button>
               <UserButton />
             </div>
           </div>
@@ -694,7 +732,11 @@ export function AuthenticatedHome() {
       </header>
 
       {/* Navigation Tabs */}
-      <nav className="shadow-sm" style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #b3a169' }}>
+      <nav className={`shadow-sm border-b-2 transition-colors duration-300 ${
+        darkMode 
+          ? 'bg-gray-800 border-gray-600' 
+          : 'bg-gray-50 border-[#b3a169]'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8">
             {[
@@ -709,13 +751,9 @@ export function AuthenticatedHome() {
                 onClick={() => setActivePage(tab.id)}
                 className={`py-4 px-2 text-sm font-medium transition-colors duration-200 border-b-2 ${
                   activePage === tab.id
-                    ? 'text-black border-current'
-                    : 'border-transparent hover:opacity-70'
+                    ? `${darkMode ? 'text-white' : 'text-[#b3a169]'} border-[#e6bf00]`
+                    : `${darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'} border-transparent`
                 }`}
-                style={{ 
-                  color: activePage === tab.id ? '#b3a169' : '#666',
-                  borderBottomColor: activePage === tab.id ? '#e6bf00' : 'transparent'
-                }}
               >
                 <span className="mr-2">{tab.icon}</span>
                 {tab.name}
