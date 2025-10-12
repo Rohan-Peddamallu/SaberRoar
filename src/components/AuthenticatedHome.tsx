@@ -3,24 +3,106 @@
 import { useEffect, useState } from "react";
 import { UserButton } from "@stackframe/stack";
 import { useUserSync } from "@/hooks/useUserSync";
-import { ThemeToggle } from "./ThemeToggle";
 
 export function AuthenticatedHome() {
   const { stackUser, dbUser, loading, error, syncUser } = useUserSync();
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isHovering, setIsHovering] = useState(false);
+  const [activePage, setActivePage] = useState('dashboard');
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
+  const [isUploading, setIsUploading] = useState(false);
 
-  // Array of images from 1.JPG to 7.JPG plus class.JPG
-  const images = [
-    "/class.JPG",
-    "/1.JPG",
-    "/2.JPG", 
-    "/3.JPG",
-    "/4.JPG",
-    "/5.JPG",
-    "/6.JPG",
-    "/7.JPG"
-  ];
+  // File upload handling
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    const validFiles = files.filter(file => {
+      const validTypes = ['video/mp4', 'video/mov', 'video/avi', 'video/quicktime'];
+      const maxSize = 2 * 1024 * 1024 * 1024; // 2GB
+      
+      if (!validTypes.includes(file.type)) {
+        alert(`${file.name} is not a supported video format. Please use MP4, MOV, or AVI.`);
+        return false;
+      }
+      
+      if (file.size > maxSize) {
+        alert(`${file.name} is too large. Maximum file size is 2GB.`);
+        return false;
+      }
+      
+      return true;
+    });
+    
+    setSelectedFiles(prevFiles => [...prevFiles, ...validFiles]);
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const files = Array.from(event.dataTransfer.files);
+    const validFiles = files.filter(file => {
+      const validTypes = ['video/mp4', 'video/mov', 'video/avi', 'video/quicktime'];
+      const maxSize = 2 * 1024 * 1024 * 1024; // 2GB
+      
+      if (!validTypes.includes(file.type)) {
+        alert(`${file.name} is not a supported video format. Please use MP4, MOV, or AVI.`);
+        return false;
+      }
+      
+      if (file.size > maxSize) {
+        alert(`${file.name} is too large. Maximum file size is 2GB.`);
+        return false;
+      }
+      
+      return true;
+    });
+    
+    setSelectedFiles(prevFiles => [...prevFiles, ...validFiles]);
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+  };
+
+  const simulateUpload = async (file: File) => {
+    return new Promise<void>((resolve) => {
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.random() * 30;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          resolve();
+        }
+        setUploadProgress(prev => ({ ...prev, [file.name]: progress }));
+      }, 500);
+    });
+  };
+
+  const handleUpload = async () => {
+    if (selectedFiles.length === 0) {
+      alert('Please select files to upload');
+      return;
+    }
+
+    setIsUploading(true);
+    
+    try {
+      // Simulate upload for each file
+      for (const file of selectedFiles) {
+        await simulateUpload(file);
+      }
+      
+      alert('Files uploaded successfully!');
+      setSelectedFiles([]);
+      setUploadProgress({});
+    } catch (error) {
+      alert('Upload failed. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   // Sync user on mount if not already synced
   useEffect(() => {
@@ -28,32 +110,6 @@ export function AuthenticatedHome() {
       syncUser();
     }
   }, [stackUser, dbUser, loading, syncUser]);
-
-  // Auto-slide images when hovering
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    
-    if (isHovering) {
-      interval = setInterval(() => {
-        setCurrentImageIndex((prevIndex) => 
-          prevIndex === images.length - 1 ? 0 : prevIndex + 1
-        );
-      }, 1000); // Change image every 1 second
-    }
-
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [isHovering, images.length]);
-
-  // Reset to first image when not hovering
-  useEffect(() => {
-    if (!isHovering) {
-      setCurrentImageIndex(0);
-    }
-  }, [isHovering]);
 
   if (loading) {
     return (
@@ -80,122 +136,598 @@ export function AuthenticatedHome() {
     );
   }
 
+  const renderDashboard = () => (
+    <div className="px-4 py-6 sm:px-0">
+      {/* Welcome Section */}
+      <div className="overflow-hidden shadow rounded-lg mb-6" style={{ backgroundColor: '#b3a169' }}>
+        <div className="px-4 py-5 sm:p-6">
+          <h2 className="text-lg leading-6 font-medium text-white mb-2">
+            Welcome back, {dbUser?.name || stackUser?.displayName || "Student"}!
+          </h2>
+          <p className="text-sm text-white opacity-90">
+            Ready to create amazing content? Upload footage, check equipment, and submit your work.
+          </p>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div 
+          onClick={() => setActivePage('upload')}
+          className="overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105" 
+          style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}
+        >
+          <div className="px-4 py-5 sm:p-6 text-center">
+            <div className="p-3 rounded-lg mx-auto mb-4 w-fit" style={{ backgroundColor: '#e6bf00' }}>
+              <svg className="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-black mb-2">Upload Footage</h3>
+            <p className="text-sm" style={{ color: '#b3a169' }}>Submit your video content</p>
+          </div>
+        </div>
+
+        <div 
+          onClick={() => setActivePage('equipment')}
+          className="overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105" 
+          style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}
+        >
+          <div className="px-4 py-5 sm:p-6 text-center">
+            <div className="p-3 rounded-lg mx-auto mb-4 w-fit" style={{ backgroundColor: '#e6bf00' }}>
+              <svg className="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-black mb-2">Equipment</h3>
+            <p className="text-sm" style={{ color: '#b3a169' }}>Sign out cameras & gear</p>
+          </div>
+        </div>
+
+        <div 
+          onClick={() => setActivePage('submissions')}
+          className="overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105" 
+          style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}
+        >
+          <div className="px-4 py-5 sm:p-6 text-center">
+            <div className="p-3 rounded-lg mx-auto mb-4 w-fit" style={{ backgroundColor: '#e6bf00' }}>
+              <svg className="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-black mb-2">Submissions</h3>
+            <p className="text-sm" style={{ color: '#b3a169' }}>Scripts & show segments</p>
+          </div>
+        </div>
+
+        <div 
+          onClick={() => setActivePage('drive')}
+          className="overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105" 
+          style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}
+        >
+          <div className="px-4 py-5 sm:p-6 text-center">
+            <div className="p-3 rounded-lg mx-auto mb-4 w-fit" style={{ backgroundColor: '#e6bf00' }}>
+              <svg className="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-black mb-2">Google Drive</h3>
+            <p className="text-sm" style={{ color: '#b3a169' }}>Browse video library</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="overflow-hidden shadow rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}>
+          <div className="px-4 py-5 sm:p-6 border-b" style={{ borderColor: '#b3a169' }}>
+            <h3 className="text-xl font-semibold text-black">Recent Activity</h3>
+          </div>
+          <div className="px-4 py-5 sm:p-6 space-y-4">
+            {[
+              { action: 'Uploaded morning segment footage', time: '2 hours ago' },
+              { action: 'Checked out Camera Kit #2', time: '1 day ago' },
+              { action: 'Submitted sports interview script', time: '3 days ago' }
+            ].map((activity, index) => (
+              <div key={index} className="flex justify-between items-center p-3 rounded-lg" style={{ backgroundColor: '#f8f9fa' }}>
+                <span className="text-black">{activity.action}</span>
+                <span className="text-sm" style={{ color: '#b3a169' }}>{activity.time}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="overflow-hidden shadow rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}>
+          <div className="px-4 py-5 sm:p-6 border-b" style={{ borderColor: '#b3a169' }}>
+            <h3 className="text-xl font-semibold text-black">Quick Links</h3>
+          </div>
+          <div className="px-4 py-5 sm:p-6 space-y-4">
+            <a href="https://drive.google.com" target="_blank" rel="noopener noreferrer" className="block p-4 rounded-lg border-2 transition-all duration-200 hover:scale-105" style={{ borderColor: '#b3a169' }}>
+              <h4 className="font-medium text-black">SaberRoar Google Drive</h4>
+              <p className="text-sm" style={{ color: '#b3a169' }}>Access all video files and resources</p>
+            </a>
+            <a href="mailto:mrdeane@school.edu" className="block p-4 rounded-lg border-2 transition-all duration-200 hover:scale-105" style={{ borderColor: '#b3a169' }}>
+              <h4 className="font-medium text-black">Contact Mr. Deane</h4>
+              <p className="text-sm" style={{ color: '#b3a169' }}>Questions about equipment or projects</p>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderEquipmentPage = () => (
+    <div className="px-4 py-6 sm:px-0">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-black mb-2">Equipment Management</h2>
+        <p style={{ color: '#b3a169' }}>Sign out cameras, microphones, and other broadcast equipment</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Available Equipment */}
+        <div className="overflow-hidden shadow rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}>
+          <div className="px-4 py-5 sm:p-6 border-b" style={{ borderColor: '#b3a169' }}>
+            <h3 className="text-xl font-semibold text-black">Available Equipment</h3>
+          </div>
+          <div className="px-4 py-5 sm:p-6 space-y-4">
+            {[
+              { item: 'Camera Kit #1', description: 'Canon DSLR with tripod', available: true },
+              { item: 'Camera Kit #2', description: 'Sony camcorder with stabilizer', available: false },
+              { item: 'Microphone Set A', description: 'Wireless lapel mics (2)', available: true },
+              { item: 'Microphone Set B', description: 'Boom mic with windscreen', available: true },
+              { item: 'Lighting Kit #1', description: '3-point lighting setup', available: false },
+              { item: 'Tripod Set #3', description: 'Heavy-duty tripods (2)', available: true }
+            ].map((equipment, index) => (
+              <div key={index} className="flex items-center justify-between p-4 rounded-lg border-2" style={{ borderColor: equipment.available ? '#e6bf00' : '#b3a169' }}>
+                <div className="flex-1">
+                  <h4 className="font-medium text-black">{equipment.item}</h4>
+                  <p className="text-sm" style={{ color: '#b3a169' }}>{equipment.description}</p>
+                </div>
+                <div className="text-right">
+                  {equipment.available ? (
+                    <button className="px-4 py-2 rounded-lg text-black font-bold transition-all duration-200 hover:scale-105" style={{ backgroundColor: '#e6bf00' }}>
+                      Sign Out
+                    </button>
+                  ) : (
+                    <span className="px-4 py-2 rounded-lg text-white font-bold" style={{ backgroundColor: '#b3a169' }}>
+                      Checked Out
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* My Equipment */}
+        <div className="overflow-hidden shadow rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}>
+          <div className="px-4 py-5 sm:p-6 border-b" style={{ borderColor: '#b3a169' }}>
+            <h3 className="text-xl font-semibold text-black">My Equipment</h3>
+          </div>
+          <div className="px-4 py-5 sm:p-6 space-y-4">
+            {[
+              { item: 'Camera Kit #3', checkedOut: '3 days ago', dueDate: 'Tomorrow' },
+              { item: 'Microphone Set C', checkedOut: '1 week ago', dueDate: 'Friday' }
+            ].map((equipment, index) => (
+              <div key={index} className="flex items-center justify-between p-4 rounded-lg border-2" style={{ borderColor: '#b3a169' }}>
+                <div className="flex-1">
+                  <h4 className="font-medium text-black">{equipment.item}</h4>
+                  <p className="text-sm" style={{ color: '#b3a169' }}>Checked out: {equipment.checkedOut}</p>
+                  <p className="text-sm font-medium text-red-600">Due: {equipment.dueDate}</p>
+                </div>
+                <button className="px-4 py-2 rounded-lg text-white font-bold transition-all duration-200 hover:scale-105" style={{ backgroundColor: '#b3a169' }}>
+                  Return
+                </button>
+              </div>
+            ))}
+            {/* Request Form */}
+            <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: '#f8f9fa', border: '2px solid #e6bf00' }}>
+              <h4 className="font-semibold text-black mb-4">Request Equipment</h4>
+              <form className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-black mb-1">Equipment Needed</label>
+                  <select className="w-full p-2 border-2 rounded-lg" style={{ borderColor: '#b3a169' }}>
+                    <option>Select equipment...</option>
+                    <option>Camera Kit</option>
+                    <option>Microphone Set</option>
+                    <option>Lighting Kit</option>
+                    <option>Tripod</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-black mb-1">Project Description</label>
+                  <textarea className="w-full p-2 border-2 rounded-lg" rows={3} style={{ borderColor: '#b3a169' }} placeholder="Describe what you'll be filming..."></textarea>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">Start Date</label>
+                    <input type="date" className="w-full p-2 border-2 rounded-lg" style={{ borderColor: '#b3a169' }} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">Return Date</label>
+                    <input type="date" className="w-full p-2 border-2 rounded-lg" style={{ borderColor: '#b3a169' }} />
+                  </div>
+                </div>
+                <button type="submit" className="w-full px-4 py-2 rounded-lg text-black font-bold transition-all duration-200 hover:scale-105" style={{ backgroundColor: '#e6bf00' }}>
+                  Submit Request
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderUploadPage = () => (
+    <div className="px-4 py-6 sm:px-0">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-black mb-2">Upload Footage</h2>
+        <p style={{ color: '#b3a169' }}>Submit your video content for review and editing</p>
+      </div>
+
+      <div className="max-w-4xl mx-auto">
+        <div className="overflow-hidden shadow rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}>
+          <div className="px-4 py-5 sm:p-6">
+            {/* File Upload Area */}
+            <div 
+              className="border-2 border-dashed rounded-lg p-12 text-center transition-colors duration-200 hover:border-solid"
+              style={{ borderColor: '#b3a169' }}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+            >
+              <svg className="mx-auto h-16 w-16 mb-4" style={{ color: '#e6bf00' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              <p className="text-xl font-medium text-black mb-2">Drop your files here</p>
+              <p className="text-sm mb-4" style={{ color: '#b3a169' }}>or click to browse</p>
+              
+              {/* Hidden file input */}
+              <input
+                type="file"
+                multiple
+                accept="video/mp4,video/mov,video/avi,video/quicktime"
+                onChange={handleFileSelect}
+                className="hidden"
+                id="file-upload"
+              />
+              
+              <label 
+                htmlFor="file-upload"
+                className="inline-block px-8 py-3 rounded-lg text-black font-bold transition-all duration-200 hover:scale-105 cursor-pointer"
+                style={{ backgroundColor: '#e6bf00' }}
+              >
+                Choose Files
+              </label>
+            </div>
+
+            {/* Selected Files Display */}
+            {selectedFiles.length > 0 && (
+              <div className="mt-6">
+                <h4 className="font-semibold text-black mb-4">Selected Files ({selectedFiles.length})</h4>
+                <div className="space-y-3">
+                  {selectedFiles.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 rounded-lg border-2" style={{ borderColor: '#b3a169' }}>
+                      <div className="flex-1">
+                        <p className="font-medium text-black">{file.name}</p>
+                        <p className="text-sm" style={{ color: '#b3a169' }}>
+                          {(file.size / (1024 * 1024)).toFixed(2)} MB
+                        </p>
+                        {uploadProgress[file.name] !== undefined && (
+                          <div className="mt-2">
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="h-2 rounded-full transition-all duration-300"
+                                style={{ 
+                                  backgroundColor: '#e6bf00',
+                                  width: `${uploadProgress[file.name]}%`
+                                }}
+                              ></div>
+                            </div>
+                            <p className="text-xs mt-1" style={{ color: '#b3a169' }}>
+                              {Math.round(uploadProgress[file.name])}% uploaded
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                      {!isUploading && (
+                        <button
+                          onClick={() => removeFile(index)}
+                          className="ml-4 px-3 py-1 rounded text-white hover:opacity-80"
+                          style={{ backgroundColor: '#b3a169' }}
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <h4 className="font-semibold text-black mb-4">File Information</h4>
+                <form className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">Project Title</label>
+                    <input type="text" className="w-full p-2 border-2 rounded-lg" style={{ borderColor: '#b3a169' }} placeholder="e.g., Morning Announcements 11/15" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">Description</label>
+                    <textarea className="w-full p-2 border-2 rounded-lg" rows={3} style={{ borderColor: '#b3a169' }} placeholder="Brief description of the content..."></textarea>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">Date Filmed</label>
+                    <input type="date" className="w-full p-2 border-2 rounded-lg" style={{ borderColor: '#b3a169' }} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">Category</label>
+                    <select className="w-full p-2 border-2 rounded-lg" style={{ borderColor: '#b3a169' }}>
+                      <option>Select category...</option>
+                      <option>Morning Announcements</option>
+                      <option>Sports</option>
+                      <option>Interviews</option>
+                      <option>Events</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                </form>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold text-black mb-4">Upload Guidelines</h4>
+                <div className="space-y-3">
+                  <div className="flex items-start">
+                    <svg className="h-5 w-5 mt-0.5 mr-2" style={{ color: '#e6bf00' }} fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm" style={{ color: '#b3a169' }}>Maximum file size: 2GB per file</span>
+                  </div>
+                  <div className="flex items-start">
+                    <svg className="h-5 w-5 mt-0.5 mr-2" style={{ color: '#e6bf00' }} fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm" style={{ color: '#b3a169' }}>Accepted formats: MP4, MOV, AVI</span>
+                  </div>
+                  <div className="flex items-start">
+                    <svg className="h-5 w-5 mt-0.5 mr-2" style={{ color: '#e6bf00' }} fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm" style={{ color: '#b3a169' }}>Include project name in filename</span>
+                  </div>
+                  <div className="flex items-start">
+                    <svg className="h-5 w-5 mt-0.5 mr-2" style={{ color: '#e6bf00' }} fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm" style={{ color: '#b3a169' }}>Files are automatically saved to Google Drive</span>
+                  </div>
+                </div>
+                
+                <button 
+                  onClick={handleUpload}
+                  disabled={selectedFiles.length === 0 || isUploading}
+                  className={`w-full mt-6 px-4 py-2 rounded-lg font-bold transition-all duration-200 ${
+                    selectedFiles.length > 0 && !isUploading 
+                      ? 'hover:scale-105 text-black' 
+                      : 'opacity-50 cursor-not-allowed text-gray-500'
+                  }`}
+                  style={{ 
+                    backgroundColor: selectedFiles.length > 0 && !isUploading ? '#e6bf00' : '#cccccc'
+                  }}
+                >
+                  {isUploading ? 'Uploading...' : `Upload ${selectedFiles.length} File${selectedFiles.length !== 1 ? 's' : ''}`}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderSubmissionsPage = () => (
+    <div className="px-4 py-6 sm:px-0">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-black mb-2">Submissions</h2>
+        <p style={{ color: '#b3a169' }}>Submit scripts, project ideas, and track your submissions</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="overflow-hidden shadow rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}>
+          <div className="px-4 py-5 sm:p-6 border-b" style={{ borderColor: '#b3a169' }}>
+            <h3 className="text-xl font-semibold text-black">Submit New Content</h3>
+          </div>
+          <div className="px-4 py-5 sm:p-6">
+            <form className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-black mb-1">Submission Type</label>
+                <select className="w-full p-2 border-2 rounded-lg" style={{ borderColor: '#b3a169' }}>
+                  <option>Select type...</option>
+                  <option>Script</option>
+                  <option>Project Idea</option>
+                  <option>Show Segment</option>
+                  <option>Interview Questions</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black mb-1">Title</label>
+                <input type="text" className="w-full p-2 border-2 rounded-lg" style={{ borderColor: '#b3a169' }} placeholder="Title of your submission..." />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black mb-1">Content</label>
+                <textarea className="w-full p-2 border-2 rounded-lg" rows={6} style={{ borderColor: '#b3a169' }} placeholder="Enter your script, idea, or content here..."></textarea>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black mb-1">Additional Notes</label>
+                <textarea className="w-full p-2 border-2 rounded-lg" rows={3} style={{ borderColor: '#b3a169' }} placeholder="Any additional information..."></textarea>
+              </div>
+              <button type="submit" className="w-full px-4 py-2 rounded-lg text-black font-bold transition-all duration-200 hover:scale-105" style={{ backgroundColor: '#e6bf00' }}>
+                Submit for Review
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div className="overflow-hidden shadow rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}>
+          <div className="px-4 py-5 sm:p-6 border-b" style={{ borderColor: '#b3a169' }}>
+            <h3 className="text-xl font-semibold text-black">My Submissions</h3>
+          </div>
+          <div className="px-4 py-5 sm:p-6 space-y-4">
+            {[
+              { title: 'Morning Announcement Script', type: 'Script', date: '2 days ago', status: 'Approved', feedback: 'Great work! Minor edits needed.' },
+              { title: 'Sports Segment Video', type: 'Show Segment', date: '1 week ago', status: 'Under Review', feedback: null },
+              { title: 'Interview Questions - Principal', type: 'Interview Questions', date: '2 weeks ago', status: 'Approved', feedback: 'Excellent questions!' }
+            ].map((submission, index) => (
+              <div key={index} className="p-4 rounded-lg border-2" style={{ borderColor: '#b3a169' }}>
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1">
+                    <h4 className="font-medium text-black">{submission.title}</h4>
+                    <p className="text-sm" style={{ color: '#b3a169' }}>{submission.type} • {submission.date}</p>
+                  </div>
+                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                    submission.status === 'Approved' 
+                      ? 'text-black' 
+                      : 'text-white'
+                  }`} style={{ 
+                    backgroundColor: submission.status === 'Approved' ? '#e6bf00' : '#b3a169'
+                  }}>
+                    {submission.status}
+                  </span>
+                </div>
+                {submission.feedback && (
+                  <div className="mt-2 p-2 rounded" style={{ backgroundColor: '#f8f9fa' }}>
+                    <p className="text-sm" style={{ color: '#b3a169' }}>
+                      <strong>Feedback:</strong> {submission.feedback}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderDrivePage = () => (
+    <div className="px-4 py-6 sm:px-0">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-black mb-2">Google Drive Library</h2>
+        <p style={{ color: '#b3a169' }}>Browse and access all SaberRoar video files and resources</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {[
+          { name: 'Morning Announcements', count: '45 videos', updated: '2 days ago' },
+          { name: 'Sports Segments', count: '23 videos', updated: '1 week ago' },
+          { name: 'Interviews', count: '12 videos', updated: '3 days ago' },
+          { name: 'School Events', count: '34 videos', updated: '1 day ago' },
+          { name: 'Templates & Scripts', count: '18 files', updated: '1 week ago' },
+          { name: 'Raw Footage', count: '67 videos', updated: '1 day ago' }
+        ].map((folder, index) => (
+          <div key={index} className="overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105" style={{ backgroundColor: '#ffffff', border: '2px solid #b3a169' }}>
+            <div className="px-4 py-5 sm:p-6 text-center">
+              <div className="p-4 rounded-lg mx-auto mb-4 w-fit" style={{ backgroundColor: '#e6bf00' }}>
+                <svg className="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-black mb-2">{folder.name}</h3>
+              <p className="text-sm mb-1" style={{ color: '#b3a169' }}>{folder.count}</p>
+              <p className="text-xs" style={{ color: '#b3a169' }}>Updated {folder.updated}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-8">
+        <a 
+          href="https://drive.google.com" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="inline-flex items-center px-6 py-3 rounded-lg text-black font-bold transition-all duration-200 hover:scale-105" 
+          style={{ backgroundColor: '#e6bf00' }}
+        >
+          <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+          Open Full Google Drive
+        </a>
+      </div>
+    </div>
+  );
+
+  const renderContent = () => {
+    switch (activePage) {
+      case 'equipment':
+        return renderEquipmentPage();
+      case 'upload':
+        return renderUploadPage();
+      case 'submissions':
+        return renderSubmissionsPage();
+      case 'drive':
+        return renderDrivePage();
+      default:
+        return renderDashboard();
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
+    <div className="min-h-screen" style={{ backgroundColor: '#ffffff' }}>
       {/* Header */}
-      <header className="shadow-xl backdrop-blur-sm bg-opacity-95" style={{ backgroundColor: '#b3a169' }}>
+      <header className="shadow" style={{ backgroundColor: '#b3a169' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-3xl font-black text-white tracking-wide">
-                SABER<span style={{ color: '#e6bf00' }}>ROAR</span>
+            <div className="flex items-center">
+              <h1 className="text-2xl font-bold text-white">
+                SaberRoar Student Portal
               </h1>
             </div>
             <div className="flex items-center gap-4">
-              <ThemeToggle />
               <UserButton />
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          {/* Welcome Section */}
-          <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-2xl shadow-xl mb-8 overflow-hidden">
-            <div className="px-8 py-6">
-              <h2 className="text-2xl font-bold text-black mb-2">
-                Welcome back, {dbUser?.name || stackUser?.displayName || "User"}! 🦁
-              </h2>
-              <p className="text-black/80 dark:text-white/80 text-lg">
-                Ready to capture Franklin High School's greatest moments?
-              </p>
-            </div>
-          </div>
-
-          {/* Image Gallery Section */}
-          <div className="mb-12">
-            <div className="text-center mb-8">
-              <h3 className="text-4xl font-black text-black dark:text-white mb-3">
-                SABER<span style={{ color: '#e6bf00' }}>ROAR</span> 
-                <span className="text-3xl font-bold text-gray-700 dark:text-gray-300 ml-3">Memories</span>
-              </h3>
-              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                Our video coverage of Franklin High School sports and events
-              </p>
-            </div>
-            <div className="flex justify-center">
-              <div 
-                className="relative group cursor-pointer"
-                onMouseEnter={() => setIsHovering(true)}
-                onMouseLeave={() => setIsHovering(false)}
+      {/* Navigation Tabs */}
+      <nav className="shadow-sm" style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #b3a169' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex space-x-8">
+            {[
+              { id: 'dashboard', name: 'Dashboard', icon: '🏠' },
+              { id: 'upload', name: 'Upload Footage', icon: '📹' },
+              { id: 'equipment', name: 'Equipment', icon: '📷' },
+              { id: 'submissions', name: 'Submissions', icon: '📝' },
+              { id: 'drive', name: 'Google Drive', icon: '💾' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActivePage(tab.id)}
+                className={`py-4 px-2 text-sm font-medium transition-colors duration-200 border-b-2 ${
+                  activePage === tab.id
+                    ? 'text-black border-current'
+                    : 'border-transparent hover:opacity-70'
+                }`}
+                style={{ 
+                  color: activePage === tab.id ? '#b3a169' : '#666',
+                  borderBottomColor: activePage === tab.id ? '#e6bf00' : 'transparent'
+                }}
               >
-                <div className="absolute -inset-6 rounded-3xl blur-xl opacity-60 group-hover:opacity-100 transition duration-500 animate-pulse" style={{ background: 'linear-gradient(45deg, #e6bf00, #b3a169, #e6bf00)' }}></div>
-                <div className="relative overflow-hidden rounded-3xl border-8 border-white shadow-2xl">
-                  <img 
-                    src={images[currentImageIndex]} 
-                    alt={`SaberRoar Image ${currentImageIndex + 1}`}
-                    className="transition-all duration-500 ease-in-out transform group-hover:scale-105 max-w-5xl w-full h-auto"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                </div>
-              </div>
-            </div>
-            <p className="text-center text-gray-500 dark:text-gray-400 mt-6 text-base font-medium">✨ Hover to see more memories</p>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 border-transparent hover:border-yellow-400">
-              <div className="px-6 py-8">
-                <div className="flex items-center">
-                  <div className="p-4 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-500 shadow-lg">
-                    <svg className="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                  </div>
-                  <div className="ml-6">
-                    <h3 className="text-3xl font-bold text-gray-800 dark:text-white">5</h3>
-                    <p className="text-gray-600 dark:text-gray-300 font-medium">Active Courses</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 border-transparent hover:border-yellow-400">
-              <div className="px-6 py-8">
-                <div className="flex items-center">
-                  <div className="p-4 rounded-2xl bg-gradient-to-br from-green-400 to-green-500 shadow-lg">
-                    <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="ml-6">
-                    <h3 className="text-3xl font-bold text-gray-800 dark:text-white">12</h3>
-                    <p className="text-gray-600 dark:text-gray-300 font-medium">Completed Tasks</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 border-transparent hover:border-yellow-400">
-              <div className="px-6 py-8">
-                <div className="flex items-center">
-                  <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-500 shadow-lg">
-                    <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="ml-6">
-                    <h3 className="text-3xl font-bold text-gray-800 dark:text-white">3</h3>
-                    <p className="text-gray-600 dark:text-gray-300 font-medium">Upcoming Events</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+                <span className="mr-2">{tab.icon}</span>
+                {tab.name}
+              </button>
+            ))}
           </div>
         </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {renderContent()}
       </main>
     </div>
   );
