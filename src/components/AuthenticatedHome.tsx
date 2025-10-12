@@ -28,14 +28,13 @@ export function AuthenticatedHome() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
         <div className="text-red-600 text-center">
-          <h2 className="text-xl font-semibold mb-2">Something went wrong</h2>
-          <p>{error}</p>
+          Error: {error}
         </div>
-        <button
+        <button 
           onClick={syncUser}
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
-          Try Again
+          Retry Sync
         </button>
       </div>
     );
@@ -53,20 +52,6 @@ export function AuthenticatedHome() {
               </h1>
             </div>
             <div className="flex items-center gap-4">
-              {dbUser && (
-                <div className="flex items-center gap-3">
-                  {dbUser.avatarUrl && (
-                    <img
-                      src={dbUser.avatarUrl}
-                      alt="Profile"
-                      className="w-8 h-8 rounded-full"
-                    />
-                  )}
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {dbUser.name || dbUser.email}
-                  </span>
-                </div>
-              )}
               <UserButton />
             </div>
           </div>
