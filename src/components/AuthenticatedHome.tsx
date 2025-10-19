@@ -301,18 +301,18 @@ export function AuthenticatedHome() {
               { item: 'Lighting Kit #1', description: '3-point lighting setup', available: false },
               { item: 'Tripod Set #3', description: 'Heavy-duty tripods (2)', available: true }
             ].map((equipment, index) => (
-              <div key={index} className={`flex items-center justify-between p-4 rounded-lg border-2 ${equipment.available ? 'border-[#e6bf00]' : 'border-[#b3a169]'}`}>
+              <div key={index} className={`flex items-center justify-between p-4 rounded-lg border-2 ${equipment.available ? (darkMode ? 'border-yellow-400' : 'border-[#e6bf00]') : (darkMode ? 'border-gray-600' : 'border-[#b3a169]')}`}>
                 <div className="flex-1">
-                  <h4 className={`${darkMode ? 'text-white' : 'text-black'}`}>{equipment.item}</h4>
+                  <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>{equipment.item}</h4>
                   <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>{equipment.description}</p>
                 </div>
                 <div className="text-right">
                   {equipment.available ? (
-                    <button className={`px-4 py-2 rounded-lg font-bold transition-all duration-200 hover:scale-105 ${darkMode ? 'text-black bg-[#e6bf00]' : 'text-black bg-[#e6bf00]'}`}>
+                    <button className="px-4 py-2 rounded-lg text-black font-bold transition-all duration-200 hover:scale-105 bg-[#e6bf00]">
                       Sign Out
                     </button>
                   ) : (
-                    <span className={`px-4 py-2 rounded-lg font-bold ${darkMode ? 'text-white bg-[#b3a169]' : 'text-white bg-[#b3a169]'}`}>
+                    <span className={`px-4 py-2 rounded-lg text-white font-bold ${darkMode ? 'bg-gray-600' : 'bg-[#b3a169]'}`}>
                       Checked Out
                     </span>
                   )}
@@ -322,57 +322,146 @@ export function AuthenticatedHome() {
           </div>
         </div>
 
-        {/* My Equipment */}
-        <div className={`overflow-hidden shadow rounded-lg border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
-          <div className={`px-4 py-5 sm:p-6 border-b ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
-            <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>My Equipment</h3>
-          </div>
-          <div className="px-4 py-5 sm:p-6 space-y-4">
-            {[
-              { item: 'Camera Kit #3', checkedOut: '3 days ago', dueDate: 'Tomorrow' },
-              { item: 'Microphone Set C', checkedOut: '1 week ago', dueDate: 'Friday' }
-            ].map((equipment, index) => (
-              <div key={index} className={`flex items-center justify-between p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
-                <div className="flex-1">
-                  <h4 className={`${darkMode ? 'text-white' : 'text-black'}`}>{equipment.item}</h4>
-                  <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Checked out: {equipment.checkedOut}</p>
-                  <p className="text-sm font-medium text-red-600">Due: {equipment.dueDate}</p>
+        {/* My Equipment & Request Form */}
+        <div className="space-y-6">
+          {/* My Equipment */}
+          <div className={`overflow-hidden shadow rounded-lg border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
+            <div className={`px-4 py-5 sm:p-6 border-b ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
+              <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>My Equipment</h3>
+            </div>
+            <div className="px-4 py-5 sm:p-6 space-y-4">
+              {[
+                { item: 'Camera Kit #3', checkedOut: '3 days ago', dueDate: 'Tomorrow' },
+                { item: 'Microphone Set C', checkedOut: '1 week ago', dueDate: 'Friday' }
+              ].map((equipment, index) => (
+                <div key={index} className={`flex items-center justify-between p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
+                  <div className="flex-1">
+                    <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>{equipment.item}</h4>
+                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Checked out: {equipment.checkedOut}</p>
+                    <p className="text-sm font-medium text-red-600">Due: {equipment.dueDate}</p>
+                  </div>
+                  <button className={`px-4 py-2 rounded-lg text-white font-bold transition-all duration-200 hover:scale-105 ${darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-[#b3a169] hover:opacity-90'}`}>
+                    Return
+                  </button>
                 </div>
-                <button className={`px-4 py-2 rounded-lg font-bold transition-all duration-200 hover:scale-105 ${darkMode ? 'text-white bg-[#b3a169]' : 'text-white bg-[#b3a169]'}`}>
-                  Return
-                </button>
-              </div>
-            ))}
-            {/* Request Form */}
-            <div className={`mt-6 p-4 rounded-lg ${darkMode ? 'bg-gray-700 border-[#e6bf00]' : 'bg-gray-50 border-[#e6bf00]'}`}>
-              <h4 className={`${darkMode ? 'text-white' : 'text-black'} font-semibold mb-4`}>Request Equipment</h4>
+              ))}
+            </div>
+          </div>
+
+          {/* Request Equipment Form */}
+          <div className={`overflow-hidden shadow rounded-lg border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
+            <div className={`px-4 py-5 sm:p-6 border-b ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
+              <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Request Equipment</h3>
+            </div>
+            <div className="px-4 py-5 sm:p-6">
               <form className="space-y-4">
+                {/* Student ID Field */}
                 <div>
-                  <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Equipment Needed</label>
-                  <select className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`}>
-                    <option>Select equipment...</option>
-                    <option>Camera Kit</option>
-                    <option>Microphone Set</option>
-                    <option>Lighting Kit</option>
-                    <option>Tripod</option>
+                  <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>
+                    Student ID <span className="text-red-500">*</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    maxLength={6}
+                    pattern="[0-9]{6}"
+                    placeholder="533421"
+                    className={`w-full p-3 border-2 rounded-lg font-mono text-lg tracking-wider transition-colors duration-200 focus:ring-2 focus:ring-[#e6bf00] focus:border-[#e6bf00] ${
+                      darkMode 
+                        ? 'bg-gray-700 text-white border-gray-600 placeholder-gray-400' 
+                        : 'bg-white text-black border-[#b3a169] placeholder-gray-500'
+                    }`}
+                    onInput={(e) => {
+                      // Only allow numbers
+                      const target = e.target as HTMLInputElement;
+                      target.value = target.value.replace(/[^0-9]/g, '');
+                    }}
+                  />
+                  <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                    Enter your 6-digit student ID number
+                  </p>
+                </div>
+
+                <div>
+                  <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>
+                    Equipment Needed <span className="text-red-500">*</span>
+                  </label>
+                  <select className={`w-full p-2 border-2 rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-[#e6bf00] focus:border-[#e6bf00] ${
+                    darkMode 
+                      ? 'bg-gray-700 text-white border-gray-600' 
+                      : 'bg-white text-black border-[#b3a169]'
+                  }`}>
+                    <option value="">Select equipment...</option>
+                    <option value="camera-kit">Camera Kit</option>
+                    <option value="microphone-set">Microphone Set</option>
+                    <option value="lighting-kit">Lighting Kit</option>
+                    <option value="tripod">Tripod</option>
+                    <option value="other">Other (specify in description)</option>
                   </select>
                 </div>
+
                 <div>
-                  <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Project Description</label>
-                  <textarea className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} rows={3} placeholder="Describe what you'll be filming..."></textarea>
+                  <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>
+                    Project Description <span className="text-red-500">*</span>
+                  </label>
+                  <textarea 
+                    className={`w-full p-2 border-2 rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-[#e6bf00] focus:border-[#e6bf00] ${
+                      darkMode 
+                        ? 'bg-gray-700 text-white border-gray-600 placeholder-gray-400' 
+                        : 'bg-white text-black border-[#b3a169] placeholder-gray-500'
+                    }`}
+                    rows={3} 
+                    placeholder="Describe what you'll be filming and how you'll use the equipment..."
+                  ></textarea>
                 </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Start Date</label>
-                    <input type="date" className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} />
+                    <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>
+                      Start Date <span className="text-red-500">*</span>
+                    </label>
+                    <input 
+                      type="date" 
+                      className={`w-full p-2 border-2 rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-[#e6bf00] focus:border-[#e6bf00] ${
+                        darkMode 
+                          ? 'bg-gray-700 text-white border-gray-600' 
+                          : 'bg-white text-black border-[#b3a169]'
+                      }`}
+                    />
                   </div>
                   <div>
-                    <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Return Date</label>
-                    <input type="date" className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} />
+                    <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>
+                      Return Date <span className="text-red-500">*</span>
+                    </label>
+                    <input 
+                      type="date" 
+                      className={`w-full p-2 border-2 rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-[#e6bf00] focus:border-[#e6bf00] ${
+                        darkMode 
+                          ? 'bg-gray-700 text-white border-gray-600' 
+                          : 'bg-white text-black border-[#b3a169]'
+                      }`}
+                    />
                   </div>
                 </div>
-                <button type="submit" className={`w-full px-4 py-2 rounded-lg font-bold transition-all duration-200 hover:scale-105 ${darkMode ? 'text-black bg-[#e6bf00]' : 'text-black bg-[#e6bf00]'}`}>
-                  Submit Request
+
+                {/* Additional Information */}
+                <div className={`p-3 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-blue-50 border-blue-200'}`}>
+                  <h4 className={`font-medium text-sm mb-2 ${darkMode ? 'text-blue-300' : 'text-blue-800'}`}>
+                    📋 Equipment Request Guidelines
+                  </h4>
+                  <ul className={`text-xs space-y-1 ${darkMode ? 'text-gray-300' : 'text-blue-700'}`}>
+                    <li>• All fields marked with * are required</li>
+                    <li>• Equipment must be returned by the specified date</li>
+                    <li>• Late returns may result in restricted access</li>
+                    <li>• You are responsible for equipment damage or loss</li>
+                    <li>• Mr. Deane will approve/deny requests within 24 hours</li>
+                  </ul>
+                </div>
+
+                <button 
+                  type="submit" 
+                  className="w-full px-4 py-3 rounded-lg text-black font-bold bg-[#e6bf00] hover:opacity-90 transition-all duration-200 hover:scale-105 focus:ring-4 focus:ring-[#e6bf00]/50"
+                >
+                  Submit Equipment Request
                 </button>
               </form>
             </div>
