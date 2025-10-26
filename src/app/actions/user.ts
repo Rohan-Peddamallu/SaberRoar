@@ -18,7 +18,7 @@ export async function syncUserAction() {
       throw new Error("Failed to sync user");
     }
 
-    revalidatePath("/dashboard");
+    revalidatePath("/student");
 
     return {
       success: true,
