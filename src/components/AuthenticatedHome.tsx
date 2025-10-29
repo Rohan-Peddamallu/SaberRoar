@@ -355,31 +355,6 @@ export function AuthenticatedHome() {
             </div>
             <div className="px-4 py-5 sm:p-6">
               <form className="space-y-4">
-                {/* Student ID Field */}
-                <div>
-                  <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>
-                    Student ID <span className="text-red-500">*</span>
-                  </label>
-                  <input 
-                    type="text" 
-                    maxLength={6}
-                    pattern="[0-9]{6}"
-                    placeholder="533421"
-                    className={`w-full p-3 border-2 rounded-lg font-mono text-lg tracking-wider transition-colors duration-200 focus:ring-2 focus:ring-[#e6bf00] focus:border-[#e6bf00] ${
-                      darkMode 
-                        ? 'bg-gray-700 text-white border-gray-600 placeholder-gray-400' 
-                        : 'bg-white text-black border-[#b3a169] placeholder-gray-500'
-                    }`}
-                    onInput={(e) => {
-                      // Only allow numbers
-                      const target = e.target as HTMLInputElement;
-                      target.value = target.value.replace(/[^0-9]/g, '');
-                    }}
-                  />
-                  <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    Enter your 6-digit student ID number
-                  </p>
-                </div>
 
                 <div>
                   <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>
