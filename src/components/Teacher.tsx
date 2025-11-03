@@ -2,10 +2,39 @@
 
 import { useState, useEffect } from "react";
 import { UserButton } from "@stackframe/stack";
+import { useToast } from "../contexts/ToastContext";
 
 export default function Teacher() {
+  interface TeacherEquipmentRequest {
+    id: string;
+    equipment: string;
+    description: string;
+    status: 'pending' | 'approved' | 'denied' | 'returned';
+    requestDate: string;
+    dueDate?: string;
+    notes?: string;
+    user?: { name?: string; email?: string };
+  }
+
+  interface TeacherFootageUpload {
+    id: string;
+    userId: string;
+    fileName: string;
+    fileSize: number;
+    fileType: string;
+    filePath: string;
+    title?: string;
+    description?: string;
+    uploadDate: string;
+    user?: { name?: string; email?: string };
+  }
+
   const [darkMode, setDarkMode] = useState(false);
   const [activePage, setActivePage] = useState('dashboard');
+  const [equipmentRequests, setEquipmentRequests] = useState<TeacherEquipmentRequest[]>([]);
+  const [footageUploads, setFootageUploads] = useState<TeacherFootageUpload[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { addToast } = useToast();
 
   // Load dark mode preference from localStorage
   useEffect(() => {
@@ -23,6 +52,121 @@ export default function Teacher() {
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
+
+  // Fetch equipment requests
+  const fetchEquipmentRequests = async () => {
+    try {
+      const response = await fetch('/api/equipment/request');
+      if (response.ok) {
+        const data = await response.json();
+        setEquipmentRequests(data.requests || []);
+      }
+    } catch (error) {
+      console.error('Error fetching equipment requests:', error);
+    }
+  };
+
+  // Fetch footage uploads
+  const fetchFootageUploads = async () => {
+    try {
+      const response = await fetch('/api/footage/upload');
+      if (response.ok) {
+        const data = await response.json();
+        setFootageUploads(data.uploads || []);
+      }
+    } catch (error) {
+      console.error('Error fetching footage uploads:', error);
+    }
+  };
+
+  // Update equipment request status
+  const updateEquipmentRequest = async (requestId: string, status: string, notes?: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/equipment/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          requestId,
+          status,
+          notes,
+        }),
+      });
+
+      if (response.ok) {
+        await fetchEquipmentRequests(); // Refresh the list
+        addToast({
+          type: 'success',
+          title: 'Equipment Request Updated',
+          message: `Request has been ${status} successfully!`,
+          duration: 4000
+        });
+      } else {
+        throw new Error('Failed to update equipment request');
+      }
+    } catch (error) {
+      console.error('Error updating equipment request:', error);
+      addToast({
+        type: 'error',
+        title: 'Update Failed',
+        message: 'Failed to update equipment request. Please try again.',
+        duration: 5000
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load data when component mounts
+  useEffect(() => {
+    fetchEquipmentRequests();
+    fetchFootageUploads();
+  }, []);
+
+  // Auto-refresh data on an interval and when tab becomes visible
+  useEffect(() => {
+    let intervalId: number | undefined;
+
+    const startPolling = () => {
+      // Poll every 10 seconds
+      intervalId = window.setInterval(() => {
+        fetchEquipmentRequests();
+        fetchFootageUploads();
+      }, 10000);
+    };
+
+    const stopPolling = () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = undefined;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        // Refresh immediately when returning to the tab
+        fetchEquipmentRequests();
+        fetchFootageUploads();
+        // Restart polling
+        stopPolling();
+        startPolling();
+      } else {
+        // Pause polling when tab is hidden
+        stopPolling();
+      }
+    };
+
+    // Start polling initially
+    startPolling();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      stopPolling();
+    };
+  }, []);
 
   const renderDashboard = () => (
     <div className="px-4 py-6 sm:px-0">
@@ -49,7 +193,9 @@ export default function Teacher() {
                 </svg>
               </div>
               <div className="ml-4">
-                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>23</h3>
+                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>
+                  {equipmentRequests.length > 0 ? new Set(equipmentRequests.map((req: any) => req.user?.name)).size : 0}
+                </h3>
                 <p className={`${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Active Students</p>
               </div>
             </div>
@@ -65,7 +211,9 @@ export default function Teacher() {
                 </svg>
               </div>
               <div className="ml-4">
-                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>7</h3>
+                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>
+                  {equipmentRequests.filter((req: any) => req.status === 'pending').length}
+                </h3>
                 <p className={`${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Pending Reviews</p>
               </div>
             </div>
@@ -81,7 +229,9 @@ export default function Teacher() {
                 </svg>
               </div>
               <div className="ml-4">
-                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>5</h3>
+                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>
+                  {equipmentRequests.filter((req: any) => req.status === 'approved').length}
+                </h3>
                 <p className={`${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Equipment Out</p>
               </div>
             </div>
@@ -97,8 +247,10 @@ export default function Teacher() {
                 </svg>
               </div>
               <div className="ml-4">
-                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>3</h3>
-                <p className={`${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Shows This Week</p>
+                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>
+                  {footageUploads.length}
+                </h3>
+                <p className={`${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Videos Uploaded</p>
               </div>
             </div>
           </div>
@@ -112,19 +264,39 @@ export default function Teacher() {
             <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Recent Student Activity</h3>
           </div>
           <div className="px-4 py-5 sm:p-6 space-y-4">
-            {[
-              { student: 'Sarah M.', action: 'Uploaded morning segment footage', time: '2 hours ago' },
-              { student: 'Jake L.', action: 'Submitted sports interview script', time: '4 hours ago' },
-              { student: 'Emma K.', action: 'Checked out Camera Kit #2', time: '1 day ago' }
-            ].map((activity, index) => (
-              <div key={index} className={`flex justify-between items-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                <div>
-                  <span className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>{activity.student}</span>
-                  <span className={`ml-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{activity.action}</span>
-                </div>
-                <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-[#b3a169]'}`}>{activity.time}</span>
+            {loading ? (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#e6bf00] mx-auto"></div>
+                <p className={`mt-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Loading activity...</p>
               </div>
-            ))}
+            ) : [...equipmentRequests, ...footageUploads].length === 0 ? (
+              <div className="text-center py-8">
+                <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No recent activity.</p>
+              </div>
+            ) : (
+              ([...equipmentRequests, ...footageUploads] as Array<TeacherEquipmentRequest | TeacherFootageUpload>)
+                .sort((a, b) => {
+                  const dateB = 'requestDate' in b ? b.requestDate : b.uploadDate;
+                  const dateA = 'requestDate' in a ? a.requestDate : a.uploadDate;
+                  return new Date(dateB).getTime() - new Date(dateA).getTime();
+                })
+                .slice(0, 5)
+                .map((item, index) => (
+                  <div key={index} className={`flex justify-between items-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                    <div>
+                      <span className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>
+                        {item.user?.name || 'Unknown Student'}
+                      </span>
+                      <span className={`ml-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    {('equipment' in item && item.equipment) ? `Requested ${item.equipment.replace('-', ' ')}` : `Uploaded ${(item as TeacherFootageUpload).fileName}`}
+                      </span>
+                    </div>
+                    <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-[#b3a169]'}`}>
+                      {new Date((item as any).requestDate || (item as any).uploadDate).toLocaleDateString()}
+                    </span>
+                  </div>
+                ))
+            )}
           </div>
         </div>
 
@@ -173,56 +345,94 @@ export default function Teacher() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className={`overflow-hidden shadow rounded-lg border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
           <div className={`px-4 py-5 sm:p-6 border-b ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
-            <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Pending Reviews</h3>
+            <div className="flex justify-between items-center">
+              <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Recent Footage Uploads</h3>
+            </div>
           </div>
           <div className="px-4 py-5 sm:p-6 space-y-4">
-            {[
-              { title: 'Morning Announcement Script', student: 'Sarah M.', type: 'Script', date: '2 hours ago' },
-              { title: 'Basketball Game Highlights', student: 'Jake L.', type: 'Video', date: '4 hours ago' },
-              { title: 'Student Interview Questions', student: 'Emma K.', type: 'Document', date: '1 day ago' }
-            ].map((submission, index) => (
-              <div key={index} className={`p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600 bg-gray-700' : 'border-[#b3a169] bg-gray-50'}`}>
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>{submission.title}</h4>
-                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>by {submission.student} • {submission.type}</p>
-                  </div>
-                  <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{submission.date}</span>
-                </div>
-                <div className="flex space-x-2">
-                  <button className="px-3 py-1 rounded text-black font-medium bg-[#e6bf00] hover:opacity-90 transition-opacity">
-                    Approve
-                  </button>
-                  <button className={`px-3 py-1 rounded font-medium transition-opacity hover:opacity-90 ${darkMode ? 'bg-gray-600 text-white' : 'bg-[#b3a169] text-white'}`}>
-                    Request Changes
-                  </button>
-                  <button className="px-3 py-1 rounded font-medium bg-red-500 text-white hover:opacity-90 transition-opacity">
-                    Reject
-                  </button>
-                </div>
+            {loading ? (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#e6bf00] mx-auto"></div>
+                <p className={`mt-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Loading uploads...</p>
               </div>
-            ))}
+            ) : footageUploads.length === 0 ? (
+              <div className="text-center py-8">
+                <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No footage uploads yet.</p>
+              </div>
+            ) : (
+              footageUploads.slice(0, 5).map((upload: any) => (
+                <div key={upload.id} className={`p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600 bg-gray-700' : 'border-[#b3a169] bg-gray-50'}`}>
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>
+                        {upload.title || upload.fileName}
+                      </h4>
+                      <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>
+                        by {upload.user?.name || 'Unknown Student'} • Video
+                      </p>
+                      <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {(upload.fileSize / (1024 * 1024)).toFixed(2)} MB • {new Date(upload.uploadDate).toLocaleDateString()}
+                      </p>
+                      {upload.description && (
+                        <p className={`text-xs mt-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          {upload.description}
+                        </p>
+                      )}
+                    </div>
+                    <span className="px-2 py-1 text-xs rounded bg-green-500 text-white font-medium">
+                      UPLOADED
+                    </span>
+                  </div>
+                  <div className="flex space-x-2">
+                    <a 
+                      href={upload.filePath} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="px-3 py-1 rounded font-medium bg-blue-500 text-white hover:opacity-90 transition-opacity"
+                    >
+                      View
+                    </a>
+                    <button className="px-3 py-1 rounded font-medium bg-[#e6bf00] text-black hover:opacity-90 transition-opacity">
+                      Download
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
         <div className={`overflow-hidden shadow rounded-lg border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
           <div className={`px-4 py-5 sm:p-6 border-b ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
-            <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Approved This Week</h3>
+            <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Approved Equipment</h3>
           </div>
           <div className="px-4 py-5 sm:p-6 space-y-4">
-            {[
-              { title: 'Sports Segment Introduction', student: 'Mike R.', approved: '2 days ago' },
-              { title: 'Club Spotlight Script', student: 'Lisa T.', approved: '3 days ago' },
-              { title: 'Weather Update Format', student: 'Alex P.', approved: '4 days ago' }
-            ].map((submission, index) => (
-              <div key={index} className={`p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
-                <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>{submission.title}</h4>
-                <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>by {submission.student}</p>
-                <span className="inline-block mt-2 px-2 py-1 text-xs rounded bg-[#e6bf00] text-black font-medium">
-                  Approved {submission.approved}
-                </span>
+            {loading ? (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#e6bf00] mx-auto"></div>
+                <p className={`mt-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Loading approved requests...</p>
               </div>
-            ))}
+            ) : equipmentRequests.filter((req: any) => req.status === 'approved').length === 0 ? (
+              <div className="text-center py-8">
+                <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No approved equipment requests yet.</p>
+              </div>
+            ) : (
+              equipmentRequests
+                .filter((req: any) => req.status === 'approved')
+                .map((request: any) => (
+                  <div key={request.id} className={`p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
+                    <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>
+                      {request.equipment.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                    </h4>
+                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>
+                      by {request.user?.name || 'Unknown Student'}
+                    </p>
+                    <span className="inline-block mt-2 px-2 py-1 text-xs rounded bg-green-500 text-white font-medium">
+                      APPROVED
+                    </span>
+                  </div>
+                ))
+            )}
           </div>
         </div>
       </div>
@@ -242,58 +452,116 @@ export default function Teacher() {
             <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Currently Checked Out</h3>
           </div>
           <div className="px-4 py-5 sm:p-6 space-y-4">
-            {[
-              { item: 'Camera Kit #1', student: 'Sarah M.', dueDate: 'Tomorrow', overdue: false },
-              { item: 'Microphone Set A', student: 'Jake L.', dueDate: 'Today', overdue: false },
-              { item: 'Lighting Kit #2', student: 'Emma K.', dueDate: 'Yesterday', overdue: true }
-            ].map((equipment, index) => (
-              <div key={index} className={`p-4 rounded-lg border-2 ${equipment.overdue ? 'border-red-500' : (darkMode ? 'border-gray-600' : 'border-[#b3a169]')}`}>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>{equipment.item}</h4>
-                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Checked out by: {equipment.student}</p>
-                    <p className={`text-sm ${equipment.overdue ? 'text-red-500 font-medium' : (darkMode ? 'text-gray-400' : 'text-gray-600')}`}>
-                      Due: {equipment.dueDate}
-                    </p>
-                  </div>
-                  {equipment.overdue && (
-                    <span className="px-2 py-1 text-xs rounded bg-red-500 text-white font-medium">
-                      OVERDUE
-                    </span>
-                  )}
-                </div>
-                <button className={`mt-2 px-3 py-1 rounded font-medium transition-opacity hover:opacity-90 ${darkMode ? 'bg-gray-600 text-white' : 'bg-[#b3a169] text-white'}`}>
-                  Mark Returned
-                </button>
+            {loading ? (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#e6bf00] mx-auto"></div>
+                <p className={`mt-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Loading checked out equipment...</p>
               </div>
-            ))}
+            ) : equipmentRequests.filter((req: any) => req.status === 'approved').length === 0 ? (
+              <div className="text-center py-8">
+                <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No equipment currently checked out.</p>
+              </div>
+            ) : (
+              equipmentRequests
+                .filter((req: any) => req.status === 'approved')
+                .map((request: any) => (
+                  <div key={request.id} className={`p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>
+                          {request.equipment.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                        </h4>
+                        <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>
+                          Checked out by: {request.user?.name || 'Unknown Student'}
+                        </p>
+                        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Requested: {new Date(request.requestDate).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <span className="px-2 py-1 text-xs rounded bg-green-500 text-white font-medium">
+                        CHECKED OUT
+                      </span>
+                    </div>
+                    <button 
+                      onClick={() => updateEquipmentRequest(request.id, 'returned')}
+                      disabled={loading}
+                      className={`mt-2 px-3 py-1 rounded font-medium transition-opacity hover:opacity-90 disabled:opacity-50 ${darkMode ? 'bg-gray-600 text-white' : 'bg-[#b3a169] text-white'}`}
+                    >
+                      Mark Returned
+                    </button>
+                  </div>
+                ))
+            )}
           </div>
         </div>
 
         <div className={`overflow-hidden shadow rounded-lg border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
           <div className={`px-4 py-5 sm:p-6 border-b ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
-            <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Equipment Requests</h3>
+            <div className="flex justify-between items-center">
+              <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Equipment Requests</h3>
+            </div>
           </div>
           <div className="px-4 py-5 sm:p-6 space-y-4">
-            {[
-              { student: 'Mike R.', equipment: 'Camera Kit #3', project: 'Football Game Coverage', requestDate: '2 hours ago' },
-              { student: 'Lisa T.', equipment: 'Tripod Set', project: 'Club Interview', requestDate: '1 day ago' }
-            ].map((request, index) => (
-              <div key={index} className={`p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
-                <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>{request.student}</h4>
-                <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Requesting: {request.equipment}</p>
-                <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Project: {request.project}</p>
-                <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{request.requestDate}</p>
-                <div className="flex space-x-2 mt-3">
-                  <button className="px-3 py-1 rounded text-black font-medium bg-[#e6bf00] hover:opacity-90 transition-opacity">
-                    Approve
-                  </button>
-                  <button className="px-3 py-1 rounded font-medium bg-red-500 text-white hover:opacity-90 transition-opacity">
-                    Deny
-                  </button>
-                </div>
+            {loading ? (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#e6bf00] mx-auto"></div>
+                <p className={`mt-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Loading requests...</p>
               </div>
-            ))}
+            ) : equipmentRequests.length === 0 ? (
+              <div className="text-center py-8">
+                <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No equipment requests at the moment.</p>
+              </div>
+            ) : (
+              equipmentRequests.map((request: any) => (
+                <div key={request.id} className={`p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>
+                      {request.user?.name || 'Unknown Student'}
+                    </h4>
+                    <span className={`px-2 py-1 text-xs rounded font-medium ${
+                      request.status === 'pending' ? 'bg-yellow-500 text-white' :
+                      request.status === 'approved' ? 'bg-green-500 text-white' :
+                      request.status === 'denied' ? 'bg-red-500 text-white' :
+                      'bg-blue-500 text-white'
+                    }`}>
+                      {request.status.toUpperCase()}
+                    </span>
+                  </div>
+                  <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>
+                    Requesting: {request.equipment.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                  </p>
+                  <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>
+                    Project: {request.description}
+                  </p>
+                  <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                    Requested: {new Date(request.requestDate).toLocaleDateString()}
+                  </p>
+                  {request.notes && (
+                    <p className={`text-xs mt-2 p-2 rounded ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
+                      <strong>Notes:</strong> {request.notes}
+                    </p>
+                  )}
+                  {request.status === 'pending' && (
+                    <div className="flex space-x-2 mt-3">
+                      <button 
+                        onClick={() => updateEquipmentRequest(request.id, 'approved')}
+                        disabled={loading}
+                        className="px-3 py-1 rounded text-black font-medium bg-[#e6bf00] hover:opacity-90 transition-opacity disabled:opacity-50"
+                      >
+                        Approve
+                      </button>
+                      <button 
+                        onClick={() => updateEquipmentRequest(request.id, 'denied')}
+                        disabled={loading}
+                        className="px-3 py-1 rounded font-medium bg-red-500 text-white hover:opacity-90 transition-opacity disabled:opacity-50"
+                      >
+                        Deny
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -313,20 +581,10 @@ export default function Teacher() {
             <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>This Week's Shows</h3>
           </div>
           <div className="px-4 py-5 sm:p-6 space-y-4">
-            {[
-              { show: 'Morning Announcements', date: 'Monday', time: '8:00 AM', host: 'Sarah M.' },
-              { show: 'Sports Update', date: 'Wednesday', time: '2:30 PM', host: 'Jake L.' },
-              { show: 'Friday Features', date: 'Friday', time: '1:00 PM', host: 'Emma K.' }
-            ].map((show, index) => (
-              <div key={index} className={`p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
-                <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>{show.show}</h4>
-                <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>{show.date} at {show.time}</p>
-                <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Host: {show.host}</p>
-                <button className="mt-2 px-3 py-1 rounded text-black font-medium bg-[#e6bf00] hover:opacity-90 transition-opacity">
-                  Edit Schedule
-                </button>
-              </div>
-            ))}
+            <div className="text-center py-8">
+              <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No shows scheduled yet.</p>
+              <p className={`text-sm mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>Use the form to add new shows.</p>
+            </div>
           </div>
         </div>
 
@@ -364,10 +622,13 @@ export default function Teacher() {
                 <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Assigned Host</label>
                 <select className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-black border-[#b3a169]'}`}>
                   <option>Select student...</option>
-                  <option>Sarah M.</option>
-                  <option>Jake L.</option>
-                  <option>Emma K.</option>
-                  <option>Mike R.</option>
+                  {equipmentRequests.length > 0 ? (
+                    Array.from(new Set(equipmentRequests.map((req: any) => req.user?.name).filter(Boolean))).map((name, index) => (
+                      <option key={index} value={name}>{name}</option>
+                    ))
+                  ) : (
+                    <option disabled>No students available</option>
+                  )}
                 </select>
               </div>
               <div>

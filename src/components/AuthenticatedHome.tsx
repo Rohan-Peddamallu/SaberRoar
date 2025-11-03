@@ -3,6 +3,17 @@
 import { useEffect, useState } from "react";
 import { UserButton } from "@stackframe/stack";
 import { useUserSync } from "@/hooks/useUserSync";
+import { useToast } from "../contexts/ToastContext";
+
+interface EquipmentRequest {
+  id: string;
+  equipment: string;
+  description: string;
+  status: 'pending' | 'approved' | 'denied' | 'returned';
+  requestDate: string;
+  dueDate?: string;
+  notes?: string;
+}
 
 export function AuthenticatedHome() {
   const { stackUser, dbUser, loading, error, syncUser } = useUserSync();
@@ -11,6 +22,29 @@ export function AuthenticatedHome() {
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
   const [isUploading, setIsUploading] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  
+  // Equipment request form state
+  const [equipmentForm, setEquipmentForm] = useState({
+    equipment: '',
+    description: '',
+    startDate: '',
+    returnDate: ''
+  });
+  const [isSubmittingEquipment, setIsSubmittingEquipment] = useState(false);
+  
+  // Footage upload form state
+  const [footageForm, setFootageForm] = useState({
+    title: '',
+    description: '',
+    dateFilmed: '',
+    category: ''
+  });
+  
+  // Equipment requests state
+  const [myEquipmentRequests, setMyEquipmentRequests] = useState<EquipmentRequest[]>([]);
+  const [loadingEquipment, setLoadingEquipment] = useState(false);
+  
+  const { addToast } = useToast();
 
   // Load dark mode preference from localStorage
   useEffect(() => {
@@ -25,8 +59,141 @@ export function AuthenticatedHome() {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
 
+  // Fetch equipment requests when component mounts
+  useEffect(() => {
+    if (dbUser) {
+      fetchMyEquipmentRequests();
+    }
+  }, [dbUser]);
+
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
+  };
+
+  // Fetch student's equipment requests
+  const fetchMyEquipmentRequests = async () => {
+    setLoadingEquipment(true);
+    try {
+      const response = await fetch('/api/equipment/request?mine=1');
+      if (response.ok) {
+        const data = await response.json();
+        // Expect API shape: { success: boolean, requests: EquipmentRequest[] }
+        const requests = Array.isArray(data?.requests) ? data.requests : [];
+        setMyEquipmentRequests(requests);
+      } else {
+        setMyEquipmentRequests([]);
+      }
+    } catch (error) {
+      console.error('Error fetching equipment requests:', error);
+      setMyEquipmentRequests([]);
+    } finally {
+      setLoadingEquipment(false);
+    }
+  };
+
+  // Equipment request form submission
+  const handleEquipmentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!equipmentForm.equipment || !equipmentForm.description) {
+      addToast({
+        type: 'warning',
+        title: 'Missing Information',
+        message: 'Please fill in all required fields',
+        duration: 4000
+      });
+      return;
+    }
+
+    setIsSubmittingEquipment(true);
+    try {
+      const response = await fetch('/api/equipment/request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          equipment: equipmentForm.equipment,
+          description: equipmentForm.description,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit equipment request');
+      }
+
+      const result = await response.json();
+      addToast({
+        type: 'success',
+        title: 'Request Submitted!',
+        message: 'Your equipment request has been submitted successfully. Mr. Deane will review it soon.',
+        duration: 5000
+      });
+      setEquipmentForm({ equipment: '', description: '', startDate: '', returnDate: '' });
+      // Refresh the equipment requests list
+      await fetchMyEquipmentRequests();
+    } catch (error) {
+      console.error('Error submitting equipment request:', error);
+      addToast({
+        type: 'error',
+        title: 'Submission Failed',
+        message: 'Failed to submit equipment request. Please try again.',
+        duration: 5000
+      });
+    } finally {
+      setIsSubmittingEquipment(false);
+    }
+  };
+
+  // Footage upload form submission
+  const handleFootageUpload = async () => {
+    if (selectedFiles.length === 0) {
+      addToast({
+        type: 'warning',
+        title: 'No Files Selected',
+        message: 'Please select at least one file to upload',
+        duration: 4000
+      });
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      for (const file of selectedFiles) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('title', footageForm.title);
+        formData.append('description', footageForm.description);
+
+        const response = await fetch('/api/footage/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to upload ${file.name}`);
+        }
+      }
+
+      addToast({
+        type: 'success',
+        title: 'Upload Complete!',
+        message: `${selectedFiles.length} file(s) uploaded successfully. Mr. Deane can now review your footage.`,
+        duration: 5000
+      });
+      setSelectedFiles([]);
+      setFootageForm({ title: '', description: '', dateFilmed: '', category: '' });
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      addToast({
+        type: 'error',
+        title: 'Upload Failed',
+        message: 'Failed to upload files. Please try again.',
+        duration: 5000
+      });
+    } finally {
+      setIsUploading(false);
+      setUploadProgress({});
+    }
   };
 
   // File upload handling
@@ -37,12 +204,22 @@ export function AuthenticatedHome() {
       const maxSize = 2 * 1024 * 1024 * 1024; // 2GB
       
       if (!validTypes.includes(file.type)) {
-        alert(`${file.name} is not a supported video format. Please use MP4, MOV, or AVI.`);
+        addToast({
+          type: 'error',
+          title: 'Invalid File Format',
+          message: `${file.name} is not a supported video format. Please use MP4, MOV, or AVI.`,
+          duration: 5000
+        });
         return false;
       }
       
       if (file.size > maxSize) {
-        alert(`${file.name} is too large. Maximum file size is 2GB.`);
+        addToast({
+          type: 'error',
+          title: 'File Too Large',
+          message: `${file.name} is too large. Maximum file size is 2GB.`,
+          duration: 5000
+        });
         return false;
       }
       
@@ -247,16 +424,35 @@ export function AuthenticatedHome() {
             <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Recent Activity</h3>
           </div>
           <div className="px-4 py-5 sm:p-6 space-y-4">
-            {[
-              { action: 'Uploaded morning segment footage', time: '2 hours ago' },
-              { action: 'Checked out Camera Kit #2', time: '1 day ago' },
-              { action: 'Submitted sports interview script', time: '3 days ago' }
-            ].map((activity, index) => (
-              <div key={index} className={`flex justify-between items-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                <span className={`${darkMode ? 'text-white' : 'text-black'}`}>{activity.action}</span>
-                <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-[#b3a169]'}`}>{activity.time}</span>
+            {loadingEquipment ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#e6bf00] mx-auto"></div>
+                <p className={`mt-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Loading activity...</p>
               </div>
-            ))}
+            ) : !Array.isArray(myEquipmentRequests) || myEquipmentRequests.length === 0 ? (
+              <div className="text-center py-8">
+                <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No recent activity yet.</p>
+                <p className={`text-sm mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>Start by uploading a video or requesting equipment!</p>
+              </div>
+            ) : (
+              Array.isArray(myEquipmentRequests) && myEquipmentRequests.length > 0 ? (
+                myEquipmentRequests.slice(0, 3).map((request: EquipmentRequest) => (
+                  <div key={request.id} className={`flex justify-between items-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                    <span className={`${darkMode ? 'text-white' : 'text-black'}`}>
+                      Requested {request.equipment} - {request.status}
+                    </span>
+                    <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-[#b3a169]'}`}>
+                      {new Date(request.requestDate).toLocaleDateString()}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No recent activity yet.</p>
+                  <p className={`text-sm mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>Start by uploading a video or requesting equipment!</p>
+                </div>
+              )
+            )}
           </div>
         </div>
 
@@ -330,21 +526,49 @@ export function AuthenticatedHome() {
               <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>My Equipment</h3>
             </div>
             <div className="px-4 py-5 sm:p-6 space-y-4">
-              {[
-                { item: 'Camera Kit #3', checkedOut: '3 days ago', dueDate: 'Tomorrow' },
-                { item: 'Microphone Set C', checkedOut: '1 week ago', dueDate: 'Friday' }
-              ].map((equipment, index) => (
-                <div key={index} className={`flex items-center justify-between p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
-                  <div className="flex-1">
-                    <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>{equipment.item}</h4>
-                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Checked out: {equipment.checkedOut}</p>
-                    <p className="text-sm font-medium text-red-600">Due: {equipment.dueDate}</p>
-                  </div>
-                  <button className={`px-4 py-2 rounded-lg text-white font-bold transition-all duration-200 hover:scale-105 ${darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-[#b3a169] hover:opacity-90'}`}>
-                    Return
-                  </button>
+              {loadingEquipment ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#e6bf00] mx-auto"></div>
+                  <p className={`mt-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Loading equipment...</p>
                 </div>
-              ))}
+              ) : !Array.isArray(myEquipmentRequests) || myEquipmentRequests.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No equipment requests yet.</p>
+                  <p className={`text-sm mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>Request equipment using the form below!</p>
+                </div>
+              ) : (
+                myEquipmentRequests.map((request: EquipmentRequest) => (
+                  <div key={request.id} className={`p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>
+                        {request.equipment}
+                      </h4>
+                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                        request.status === 'approved' 
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          : request.status === 'denied'
+                          ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                          : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                      }`}>
+                        {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                      </span>
+                    </div>
+                    <p className={`text-sm mb-2 ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>
+                      {request.description}
+                    </p>
+                    <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      Requested: {new Date(request.requestDate).toLocaleDateString()}
+                    </p>
+                    {request.notes && (
+                      <div className={`mt-2 p-2 rounded ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                        <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>
+                          <strong>Notes:</strong> {request.notes}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -354,17 +578,21 @@ export function AuthenticatedHome() {
               <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Request Equipment</h3>
             </div>
             <div className="px-4 py-5 sm:p-6">
-              <form className="space-y-4">
+              <form onSubmit={handleEquipmentSubmit} className="space-y-4">
 
                 <div>
                   <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>
                     Equipment Needed <span className="text-red-500">*</span>
                   </label>
-                  <select className={`w-full p-2 border-2 rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-[#e6bf00] focus:border-[#e6bf00] ${
-                    darkMode 
-                      ? 'bg-gray-700 text-white border-gray-600' 
-                      : 'bg-white text-black border-[#b3a169]'
-                  }`}>
+                  <select 
+                    value={equipmentForm.equipment}
+                    onChange={(e) => setEquipmentForm(prev => ({ ...prev, equipment: e.target.value }))}
+                    className={`w-full p-2 border-2 rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-[#e6bf00] focus:border-[#e6bf00] ${
+                      darkMode 
+                        ? 'bg-gray-700 text-white border-gray-600' 
+                        : 'bg-white text-black border-[#b3a169]'
+                    }`}
+                  >
                     <option value="">Select equipment...</option>
                     <option value="camera-kit">Camera Kit</option>
                     <option value="microphone-set">Microphone Set</option>
@@ -379,6 +607,8 @@ export function AuthenticatedHome() {
                     Project Description <span className="text-red-500">*</span>
                   </label>
                   <textarea 
+                    value={equipmentForm.description}
+                    onChange={(e) => setEquipmentForm(prev => ({ ...prev, description: e.target.value }))}
                     className={`w-full p-2 border-2 rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-[#e6bf00] focus:border-[#e6bf00] ${
                       darkMode 
                         ? 'bg-gray-700 text-white border-gray-600 placeholder-gray-400' 
@@ -434,9 +664,14 @@ export function AuthenticatedHome() {
 
                 <button 
                   type="submit" 
-                  className="w-full px-4 py-3 rounded-lg text-black font-bold bg-[#e6bf00] hover:opacity-90 transition-all duration-200 hover:scale-105 focus:ring-4 focus:ring-[#e6bf00]/50"
+                  disabled={isSubmittingEquipment}
+                  className={`w-full px-4 py-3 rounded-lg font-bold transition-all duration-200 focus:ring-4 focus:ring-[#e6bf00]/50 ${
+                    isSubmittingEquipment 
+                      ? 'opacity-50 cursor-not-allowed bg-gray-400 text-gray-600' 
+                      : 'text-black bg-[#e6bf00] hover:opacity-90 hover:scale-105'
+                  }`}
                 >
-                  Submit Equipment Request
+                  {isSubmittingEquipment ? 'Submitting...' : 'Submit Equipment Request'}
                 </button>
               </form>
             </div>
@@ -535,25 +770,46 @@ export function AuthenticatedHome() {
                 <form className="space-y-4">
                   <div>
                     <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Project Title</label>
-                    <input type="text" className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} placeholder="e.g., Morning Announcements 11/15" />
+                    <input 
+                      type="text" 
+                      value={footageForm.title}
+                      onChange={(e) => setFootageForm(prev => ({ ...prev, title: e.target.value }))}
+                      className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} 
+                      placeholder="e.g., Morning Announcements 11/15" 
+                    />
                   </div>
                   <div>
                     <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Description</label>
-                    <textarea className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} rows={3} placeholder="Brief description of the content..."></textarea>
+                    <textarea 
+                      value={footageForm.description}
+                      onChange={(e) => setFootageForm(prev => ({ ...prev, description: e.target.value }))}
+                      className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} 
+                      rows={3} 
+                      placeholder="Brief description of the content..."
+                    ></textarea>
                   </div>
                   <div>
                     <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Date Filmed</label>
-                    <input type="date" className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} />
+                    <input 
+                      type="date" 
+                      value={footageForm.dateFilmed}
+                      onChange={(e) => setFootageForm(prev => ({ ...prev, dateFilmed: e.target.value }))}
+                      className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`} 
+                    />
                   </div>
                   <div>
                     <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>Category</label>
-                    <select className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`}>
-                      <option>Select category...</option>
-                      <option>Morning Announcements</option>
-                      <option>Sports</option>
-                      <option>Interviews</option>
-                      <option>Events</option>
-                      <option>Other</option>
+                    <select 
+                      value={footageForm.category}
+                      onChange={(e) => setFootageForm(prev => ({ ...prev, category: e.target.value }))}
+                      className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-[#b3a169]'}`}
+                    >
+                      <option value="">Select category...</option>
+                      <option value="morning-announcements">Morning Announcements</option>
+                      <option value="sports">Sports</option>
+                      <option value="interviews">Interviews</option>
+                      <option value="events">Events</option>
+                      <option value="other">Other</option>
                     </select>
                   </div>
                 </form>
@@ -589,7 +845,7 @@ export function AuthenticatedHome() {
                 </div>
                 
                 <button 
-                  onClick={handleUpload}
+                  onClick={handleFootageUpload}
                   disabled={selectedFiles.length === 0 || isUploading}
                   className={`w-full mt-6 px-4 py-2 rounded-lg font-bold transition-all duration-200 ${
                     selectedFiles.length > 0 && !isUploading 
@@ -658,36 +914,10 @@ export function AuthenticatedHome() {
             <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>My Submissions</h3>
           </div>
           <div className="px-4 py-5 sm:p-6 space-y-4">
-            {[
-              { title: 'Morning Announcement Script', type: 'Script', date: '2 days ago', status: 'Approved', feedback: 'Great work! Minor edits needed.' },
-              { title: 'Sports Segment Video', type: 'Show Segment', date: '1 week ago', status: 'Under Review', feedback: null },
-              { title: 'Interview Questions - Principal', type: 'Interview Questions', date: '2 weeks ago', status: 'Approved', feedback: 'Excellent questions!' }
-            ].map((submission, index) => (
-              <div key={index} className={`p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <h4 className={`${darkMode ? 'text-white' : 'text-black'}`}>{submission.title}</h4>
-                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>{submission.type} • {submission.date}</p>
-                  </div>
-                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                    submission.status === 'Approved' 
-                      ? 'text-black' 
-                      : 'text-white'
-                  }`} style={{ 
-                    backgroundColor: submission.status === 'Approved' ? '#e6bf00' : '#b3a169'
-                  }}>
-                    {submission.status}
-                  </span>
-                </div>
-                {submission.feedback && (
-                  <div className={`mt-2 p-2 rounded ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>
-                      <strong>Feedback:</strong> {submission.feedback}
-                    </p>
-                  </div>
-                )}
-              </div>
-            ))}
+            <div className="text-center py-8">
+              <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No submissions yet.</p>
+              <p className={`text-sm mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>Submit your first script or project idea!</p>
+            </div>
           </div>
         </div>
       </div>
@@ -702,28 +932,40 @@ export function AuthenticatedHome() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {[
-          { name: 'Morning Announcements', count: '45 videos', updated: '2 days ago' },
-          { name: 'Sports Segments', count: '23 videos', updated: '1 week ago' },
-          { name: 'Interviews', count: '12 videos', updated: '3 days ago' },
-          { name: 'School Events', count: '34 videos', updated: '1 day ago' },
-          { name: 'Templates & Scripts', count: '18 files', updated: '1 week ago' },
-          { name: 'Raw Footage', count: '67 videos', updated: '1 day ago' }
-        ].map((folder, index) => (
-          <div key={index} className={`overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105 border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
-            <div className="px-4 py-5 sm:p-6 text-center">
-              <div className="p-4 rounded-lg mx-auto mb-4 w-fit bg-[#e6bf00]">
-                <svg className="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
-                </svg>
-              </div>
-              <h3 className={`text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>{folder.name}</h3>
-              <p className={`text-sm mb-1 ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>{folder.count}</p>
-              <p className={`text-xs ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Updated {folder.updated}</p>
-            </div>
+        {loading ? (
+          <div className="col-span-full text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#e6bf00] mx-auto"></div>
+            <p className={`mt-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Loading library...</p>
           </div>
-        ))}
+        ) : selectedFiles.length === 0 ? (
+          <div className="col-span-full text-center py-12">
+            <div className="p-4 rounded-lg mx-auto mb-4 w-fit bg-gray-100 dark:bg-gray-700">
+              <svg className="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
+              </svg>
+            </div>
+            <h3 className={`text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>No Videos Yet</h3>
+            <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Upload your first video to get started!</p>
+          </div>
+        ) : (
+          selectedFiles.map((file, index) => (
+            <div key={index} className={`overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-300 hover:scale-105 border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
+              <div className="px-4 py-5 sm:p-6 text-center">
+                <div className="p-4 rounded-lg mx-auto mb-4 w-fit bg-[#e6bf00]">
+                  <svg className="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className={`text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>{file.name}</h3>
+                <p className={`text-sm mb-1 ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>
+                  {(file.size / (1024 * 1024)).toFixed(2)} MB
+                </p>
+                <p className={`text-xs ${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Ready to upload</p>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <div className="mt-8">

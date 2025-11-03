@@ -73,8 +73,14 @@ export function LandingPage() {
               </h1>
             </div>
             
-            {/* Center - Social Media Links */}
+            {/* Center - Meet the Team Link and Social Media Links */}
             <div className="flex items-center space-x-6">
+              <Link 
+                href="/team"
+                className="text-white hover:text-yellow-300 font-semibold transition-all duration-300 hover:underline"
+              >
+                Meet the Team
+              </Link>
               <a 
                 href="https://www.youtube.com/@TheSaberRoar/featured"
                 target="_blank"
