@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // Verify user is authenticated
     const stackUser = await stackServerApp.getUser();

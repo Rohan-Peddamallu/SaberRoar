@@ -92,7 +92,7 @@ export function TeamPage() {
               <span style={{ color: '#e6bf00' }}>Team</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              The talented students behind SaberRoar's video production
+              The talented students behind SaberRoar&apos;s video production
             </p>
           </div>
         </div>
@@ -130,7 +130,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "Leading and inspiring the next generation of video production professionals at Franklin High School."
+                    &quot;Leading and inspiring the next generation of video production professionals at Franklin High School.&quot;
                   </p>
                 </div>
               </div>
@@ -163,7 +163,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "My name is Nolan Gertz and I am a Junior here at Franklin High School. I especially enjoy being in front of the camera and bringing something positive to each show."
+                    &quot;My name is Nolan Gertz and I am a Junior here at Franklin High School. I especially enjoy being in front of the camera and bringing something positive to each show.&quot;
                   </p>
                 </div>
               </div>
@@ -196,7 +196,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "My name is Sufyaan Bhimani. I've been in a lot of films in Saber Roar, one of my favorite films that I've acted in is Bowling with punishments. I am a very creative person and I can think of many ideas on spot."
+                    &quot;My name is Sufyaan Bhimani. I&apos;ve been in a lot of films in Saber Roar, one of my favorite films that I&apos;ve acted in is Bowling with punishments. I am a very creative person and I can think of many ideas on spot.&quot;
                   </p>
                 </div>
               </div>
@@ -229,7 +229,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "I've worked on a variety of projects and in different roles. My favorite things to make are short films and interviews, whether I'm behind the camera or in front of it. Outside of school, I enjoy doing photography in my free time."
+                    &quot;I&apos;ve worked on a variety of projects and in different roles. My favorite things to make are short films and interviews, whether I&apos;m behind the camera or in front of it. Outside of school, I enjoy doing photography in my free time.&quot;
                   </p>
                 </div>
               </div>
@@ -262,7 +262,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "I'm mainly a creative director on the Saber Roar. I've taken part in several projects prior to joining, such as playing as the Jack in the Box mascot twice for commercial and horror projects."
+                    &quot;I&apos;m mainly a creative director on the Saber Roar. I&apos;ve taken part in several projects prior to joining, such as playing as the Jack in the Box mascot twice for commercial and horror projects.&quot;
                   </p>
                 </div>
               </div>
@@ -295,7 +295,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "I am the Coordinating Producer for TSR and a dedicated individual with a strong passion for video production. I ensure every episode reaches the highest level of quality possible."
+                    &quot;I am the Coordinating Producer for TSR and a dedicated individual with a strong passion for video production. I ensure every episode reaches the highest level of quality possible.&quot;
                   </p>
                 </div>
               </div>
@@ -328,7 +328,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "My name is Jeremiah Brand. I am a senior and I have been in video production since freshman year. My talents include interviewing, acting, and recording video."
+                    &quot;My name is Jeremiah Brand. I am a senior and I have been in video production since freshman year. My talents include interviewing, acting, and recording video.&quot;
                   </p>
                 </div>
               </div>
@@ -361,7 +361,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "I am mostly a videographer in each of my segments. I have taken part with mostly informational segments starting with the New Beginnings and going to the fire station."
+                    &quot;I am mostly a videographer in each of my segments. I have taken part with mostly informational segments starting with the New Beginnings and going to the fire station.&quot;
                   </p>
                 </div>
               </div>
@@ -394,7 +394,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "As the Sports Director for TSR, I help lead coverage of Franklin High School athletics through filming, editing, and producing sports content that showcases our student-athletes."
+                    &quot;As the Sports Director for TSR, I help lead coverage of Franklin High School athletics through filming, editing, and producing sports content that showcases our student-athletes.&quot;
                   </p>
                 </div>
               </div>
@@ -427,7 +427,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "My name is Braeden LaPorte, I am a Junior at Franklin High school. I am the News Director of the Saber Roar. I am usually the person behind the creation of news segments."
+                    &quot;My name is Braeden LaPorte, I am a Junior at Franklin High school. I am the News Director of the Saber Roar. I am usually the person behind the creation of news segments.&quot;
                   </p>
                 </div>
               </div>
@@ -460,7 +460,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "I take role as Creative Director in the Saber Roar and lead most creative projects. I've been interested in creative film since middle school hoping to do it as a career."
+                    &quot;I take role as Creative Director in the Saber Roar and lead most creative projects. I&apos;ve been interested in creative film since middle school hoping to do it as a career.&quot;
                   </p>
                 </div>
               </div>
@@ -493,7 +493,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "Being part of the Saber Roar has helped me grow a lot as the social media manager. Working on the broadcast taught me how to meet deadlines, work with a team, and stay creative under pressure."
+                    &quot;Being part of the Saber Roar has helped me grow a lot as the social media manager. Working on the broadcast taught me how to meet deadlines, work with a team, and stay creative under pressure.&quot;
                   </p>
                 </div>
               </div>
@@ -526,7 +526,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "I've taken on many creative roles that include on-screen talent, and directing. Outside of the class I'm also involved in arts and culture projects, coordinating events, and running social media pages."
+                    &quot;I&apos;ve taken on many creative roles that include on-screen talent, and directing. Outside of the class I&apos;m also involved in arts and culture projects, coordinating events, and running social media pages.&quot;
                   </p>
                 </div>
               </div>
@@ -559,7 +559,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "My Name is Asa Arvanetes and I'm a junior at Franklin high school. I enjoy doing new things in the Saber Roar and creating new bonds with the community around us."
+                    &quot;My Name is Asa Arvanetes and I&apos;m a junior at Franklin high school. I enjoy doing new things in the Saber Roar and creating new bonds with the community around us.&quot;
                   </p>
                 </div>
               </div>
@@ -592,7 +592,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "I have taken part in the Saber Roar as an actor and camera crew for some projects like the first episode and second episode. I like to act, draw, and play some video games."
+                    &quot;I have taken part in the Saber Roar as an actor and camera crew for some projects like the first episode and second episode. I like to act, draw, and play some video games.&quot;
                   </p>
                 </div>
               </div>
@@ -625,7 +625,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "I'm Aiden! Currently a senior in FHS, I'm one of the Coordinating Producers in The Saber Roar. I really love to create content for myself and The Saber Roar and hope to continue it in the future."
+                    &quot;I&apos;m Aiden! Currently a senior in FHS, I&apos;m one of the Coordinating Producers in The Saber Roar. I really love to create content for myself and The Saber Roar and hope to continue it in the future.&quot;
                   </p>
                 </div>
               </div>
@@ -658,7 +658,7 @@ export function TeamPage() {
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "I'm definitely the obsessor of the saber roar. I have directed most of the segments I'm in and have edited EVERY single project I'm in."
+                    &quot;I&apos;m definitely the obsessor of the saber roar. I have directed most of the segments I&apos;m in and have edited EVERY single project I&apos;m in.&quot;
                   </p>
                 </div>
               </div>

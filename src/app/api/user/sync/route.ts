@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { stackServerApp } from "../../../../stack";
 import { syncCurrentUser } from "../../../../lib/sync-user";
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     // Verify user is authenticated
     const user = await stackServerApp.getUser();
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // Verify user is authenticated
     const user = await stackServerApp.getUser();

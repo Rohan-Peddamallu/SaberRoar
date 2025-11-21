@@ -182,7 +182,7 @@ export function LandingPage() {
               What We <span style={{ color: '#e6bf00' }}>Do</span>
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              SaberRoar captures and shares Franklin High School's greatest moments
+              SaberRoar captures and shares Franklin High School&apos;s greatest moments
             </p>
           </div>
           
@@ -236,7 +236,7 @@ export function LandingPage() {
                 <span style={{ color: '#e6bf00' }}>ROAR</span>
               </h3>
               <p className="text-gray-300 text-lg leading-relaxed">
-                Franklin High School's video production team, recording sports games and school events.
+                Franklin High School&apos;s video production team, recording sports games and school events.
               </p>
             </div>
             

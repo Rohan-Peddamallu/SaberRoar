@@ -194,7 +194,7 @@ export default function Teacher() {
               </div>
               <div className="ml-4">
                 <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>
-                  {equipmentRequests.length > 0 ? new Set(equipmentRequests.map((req: any) => req.user?.name)).size : 0}
+                  {equipmentRequests.length > 0 ? new Set(equipmentRequests.map((req) => req.user?.name)).size : 0}
                 </h3>
                 <p className={`${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Active Students</p>
               </div>
@@ -212,7 +212,7 @@ export default function Teacher() {
               </div>
               <div className="ml-4">
                 <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>
-                  {equipmentRequests.filter((req: any) => req.status === 'pending').length}
+                  {equipmentRequests.filter((req) => req.status === 'pending').length}
                 </h3>
                 <p className={`${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Pending Reviews</p>
               </div>
@@ -230,7 +230,7 @@ export default function Teacher() {
               </div>
               <div className="ml-4">
                 <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>
-                  {equipmentRequests.filter((req: any) => req.status === 'approved').length}
+                  {equipmentRequests.filter((req) => req.status === 'approved').length}
                 </h3>
                 <p className={`${darkMode ? 'text-gray-300' : 'text-[#b3a169]'}`}>Equipment Out</p>
               </div>
@@ -292,7 +292,7 @@ export default function Teacher() {
                       </span>
                     </div>
                     <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-[#b3a169]'}`}>
-                      {new Date((item as any).requestDate || (item as any).uploadDate).toLocaleDateString()}
+                      {new Date('requestDate' in item ? item.requestDate : item.uploadDate).toLocaleDateString()}
                     </span>
                   </div>
                 ))
@@ -360,7 +360,7 @@ export default function Teacher() {
                 <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No footage uploads yet.</p>
               </div>
             ) : (
-              footageUploads.slice(0, 5).map((upload: any) => (
+              footageUploads.slice(0, 5).map((upload) => (
                 <div key={upload.id} className={`p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600 bg-gray-700' : 'border-[#b3a169] bg-gray-50'}`}>
                   <div className="flex justify-between items-start mb-2">
                     <div>
@@ -412,14 +412,14 @@ export default function Teacher() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#e6bf00] mx-auto"></div>
                 <p className={`mt-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Loading approved requests...</p>
               </div>
-            ) : equipmentRequests.filter((req: any) => req.status === 'approved').length === 0 ? (
+            ) : equipmentRequests.filter((req) => req.status === 'approved').length === 0 ? (
               <div className="text-center py-8">
                 <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No approved equipment requests yet.</p>
               </div>
             ) : (
               equipmentRequests
-                .filter((req: any) => req.status === 'approved')
-                .map((request: any) => (
+                .filter((req) => req.status === 'approved')
+                .map((request) => (
                   <div key={request.id} className={`p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
                     <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>
                       {request.equipment.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
@@ -457,14 +457,14 @@ export default function Teacher() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#e6bf00] mx-auto"></div>
                 <p className={`mt-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Loading checked out equipment...</p>
               </div>
-            ) : equipmentRequests.filter((req: any) => req.status === 'approved').length === 0 ? (
+            ) : equipmentRequests.filter((req) => req.status === 'approved').length === 0 ? (
               <div className="text-center py-8">
                 <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No equipment currently checked out.</p>
               </div>
             ) : (
               equipmentRequests
-                .filter((req: any) => req.status === 'approved')
-                .map((request: any) => (
+                .filter((req) => req.status === 'approved')
+                .map((request) => (
                   <div key={request.id} className={`p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
                     <div className="flex justify-between items-start">
                       <div>
@@ -512,7 +512,7 @@ export default function Teacher() {
                 <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No equipment requests at the moment.</p>
               </div>
             ) : (
-              equipmentRequests.map((request: any) => (
+              equipmentRequests.map((request) => (
                 <div key={request.id} className={`p-4 rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
                   <div className="flex justify-between items-start mb-2">
                     <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-black'}`}>
@@ -578,7 +578,7 @@ export default function Teacher() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className={`overflow-hidden shadow rounded-lg border-2 ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#b3a169]'}`}>
           <div className={`px-4 py-5 sm:p-6 border-b ${darkMode ? 'border-gray-600' : 'border-[#b3a169]'}`}>
-            <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>This Week's Shows</h3>
+            <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>This Week&apos;s Shows</h3>
           </div>
           <div className="px-4 py-5 sm:p-6 space-y-4">
             <div className="text-center py-8">
@@ -623,7 +623,7 @@ export default function Teacher() {
                 <select className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-black border-[#b3a169]'}`}>
                   <option>Select student...</option>
                   {equipmentRequests.length > 0 ? (
-                    Array.from(new Set(equipmentRequests.map((req: any) => req.user?.name).filter(Boolean))).map((name, index) => (
+                    Array.from(new Set(equipmentRequests.map((req) => req.user?.name).filter(Boolean))).map((name, index) => (
                       <option key={index} value={name}>{name}</option>
                     ))
                   ) : (

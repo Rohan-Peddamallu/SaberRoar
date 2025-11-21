@@ -260,44 +260,6 @@ export function AuthenticatedHome() {
     setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
   };
 
-  const simulateUpload = async (file: File) => {
-    return new Promise<void>((resolve) => {
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += Math.random() * 30;
-        if (progress >= 100) {
-          progress = 100;
-          clearInterval(interval);
-          resolve();
-        }
-        setUploadProgress(prev => ({ ...prev, [file.name]: progress }));
-      }, 500);
-    });
-  };
-
-  const handleUpload = async () => {
-    if (selectedFiles.length === 0) {
-      alert('Please select files to upload');
-      return;
-    }
-
-    setIsUploading(true);
-    
-    try {
-      // Simulate upload for each file
-      for (const file of selectedFiles) {
-        await simulateUpload(file);
-      }
-      
-      alert('Files uploaded successfully!');
-      setSelectedFiles([]);
-      setUploadProgress({});
-    } catch (error) {
-      alert('Upload failed. Please try again.');
-    } finally {
-      setIsUploading(false);
-    }
-  };
 
   // Sync user on mount if not already synced
   useEffect(() => {
