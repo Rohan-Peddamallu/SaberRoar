@@ -103,34 +103,133 @@ export function TeamPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Team Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {/* Elijah Hendon */}
+            {/* Mr. Deane */}
             <div className="group relative bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-[#e6bf00] hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 transform">
               <div className="relative h-80 overflow-hidden">
                 <img 
-                  src="/Elijah.JPG" 
-                  alt="Elijah Hendon" 
+                  src="/deane.JPG" 
+                  alt="Mr. Deane" 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-black dark:text-white mb-2 group-hover:text-[#e6bf00] transition-colors duration-300">Elijah Hendon</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 font-medium">elijah.hendon@franklinsabers.org</p>
+                <h3 className="text-2xl font-bold text-black dark:text-white mb-2 group-hover:text-[#e6bf00] transition-colors duration-300">Mr. Deane</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 font-medium">nabeel.deane@franklin.k12.wi.us</p>
                 
                 <div className="space-y-3 mb-4">
                   <div>
                     <p className="text-xs font-bold text-[#b3a169] dark:text-[#e6bf00] mb-2 uppercase tracking-wide">Specializations</p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">Video, Photography, Technical Work</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">Teacher, Advisor, Video Production</p>
                   </div>
                   <div>
                     <p className="text-xs font-bold text-[#b3a169] dark:text-[#e6bf00] mb-2 uppercase tracking-wide">Skills</p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">Lighting, Audio, Editing, Writing, Producing, News, Feature, Short Film, Commercial, Music Video, PSA, Interview, Directing, Coordinating, Social Media</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">Teaching, Mentoring, Producing, Directing, Coordinating</p>
                   </div>
                 </div>
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "I'm definitely the obsessor of the saber roar. I have directed most of the segments I'm in and have edited EVERY single project I'm in."
+                    "Leading and inspiring the next generation of video production professionals at Franklin High School."
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Nolan Gertz */}
+            <div className="group relative bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-[#e6bf00] hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 transform">
+              <div className="relative h-80 overflow-hidden">
+                <img 
+                  src="/Nolan.JPG" 
+                  alt="Nolan Gertz" 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-bold text-black dark:text-white mb-2 group-hover:text-[#e6bf00] transition-colors duration-300">Nolan Gertz</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 font-medium">nolan.gertz@franklinsabers.org</p>
+                
+                <div className="space-y-3 mb-4">
+                  <div>
+                    <p className="text-xs font-bold text-[#b3a169] dark:text-[#e6bf00] mb-2 uppercase tracking-wide">Specializations</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">Video, Photography, Technical Work, On-Screen Talent</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-[#b3a169] dark:text-[#e6bf00] mb-2 uppercase tracking-wide">Skills</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">Writing, Producing, Creative Work, News, Feature, Short Film, Music Video, Interview, Marketing</p>
+                  </div>
+                </div>
+                
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
+                    "My name is Nolan Gertz and I am a Junior here at Franklin High School. I especially enjoy being in front of the camera and bringing something positive to each show."
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Sufyaan Bhimani */}
+            <div className="group relative bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-[#e6bf00] hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 transform">
+              <div className="relative h-80 overflow-hidden">
+                <img 
+                  src="/Sufyaan.JPG" 
+                  alt="Sufyaan Bhimani" 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-bold text-black dark:text-white mb-2 group-hover:text-[#e6bf00] transition-colors duration-300">Sufyaan Bhimani</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 font-medium">sufyaan.bhimani@franklinsabers.org</p>
+                
+                <div className="space-y-3 mb-4">
+                  <div>
+                    <p className="text-xs font-bold text-[#b3a169] dark:text-[#e6bf00] mb-2 uppercase tracking-wide">Specializations</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">On-Screen Talent, Writing, Producing, Creative Work</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-[#b3a169] dark:text-[#e6bf00] mb-2 uppercase tracking-wide">Skills</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">Short Film, Commercial, Directing, Marketing</p>
+                  </div>
+                </div>
+                
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
+                    "My name is Sufyaan Bhimani. I've been in a lot of films in Saber Roar, one of my favorite films that I've acted in is Bowling with punishments. I am a very creative person and I can think of many ideas on spot."
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Lilyana Bullamore */}
+            <div className="group relative bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-[#e6bf00] hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 transform">
+              <div className="relative h-80 overflow-hidden">
+                <img 
+                  src="/Lilyana.JPG" 
+                  alt="Lilyana Bullamore" 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-bold text-black dark:text-white mb-2 group-hover:text-[#e6bf00] transition-colors duration-300">Lilyana Bullamore</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 font-medium">lilyana.bullamore@franklinsabers.org</p>
+                
+                <div className="space-y-3 mb-4">
+                  <div>
+                    <p className="text-xs font-bold text-[#b3a169] dark:text-[#e6bf00] mb-2 uppercase tracking-wide">Specializations</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">Video, Photography, Technical Work, Writing, Producing, Creative Work</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-[#b3a169] dark:text-[#e6bf00] mb-2 uppercase tracking-wide">Skills</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">Short Film, Arts & Culture, Directing, Coordinating, Social Media, Marketing</p>
+                  </div>
+                </div>
+                
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
+                    "I've worked on a variety of projects and in different roles. My favorite things to make are short films and interviews, whether I'm behind the camera or in front of it. Outside of school, I enjoy doing photography in my free time."
                   </p>
                 </div>
               </div>
@@ -296,39 +395,6 @@ export function TeamPage() {
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
                     "As the Sports Director for TSR, I help lead coverage of Franklin High School athletics through filming, editing, and producing sports content that showcases our student-athletes."
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Nolan Gertz */}
-            <div className="group relative bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-[#e6bf00] hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 transform">
-              <div className="relative h-80 overflow-hidden">
-                <img 
-                  src="/Nolan.JPG" 
-                  alt="Nolan Gertz" 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              </div>
-              <div className="p-6">
-                <h3 className="text-2xl font-bold text-black dark:text-white mb-2 group-hover:text-[#e6bf00] transition-colors duration-300">Nolan Gertz</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 font-medium">nolan.gertz@franklinsabers.org</p>
-                
-                <div className="space-y-3 mb-4">
-                  <div>
-                    <p className="text-xs font-bold text-[#b3a169] dark:text-[#e6bf00] mb-2 uppercase tracking-wide">Specializations</p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">Video, Photography, Technical Work, On-Screen Talent</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-[#b3a169] dark:text-[#e6bf00] mb-2 uppercase tracking-wide">Skills</p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">Writing, Producing, Creative Work, News, Feature, Short Film, Music Video, Interview, Marketing</p>
-                  </div>
-                </div>
-                
-                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "My name is Nolan Gertz and I am a Junior here at Franklin High School. I especially enjoy being in front of the camera and bringing something positive to each show."
                   </p>
                 </div>
               </div>
@@ -565,67 +631,34 @@ export function TeamPage() {
               </div>
             </div>
 
-            {/* Sufyaan Bhimani */}
+            {/* Elijah Hendon */}
             <div className="group relative bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-[#e6bf00] hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 transform">
               <div className="relative h-80 overflow-hidden">
                 <img 
-                  src="/Sufyaan.JPG" 
-                  alt="Sufyaan Bhimani" 
+                  src="/Elijah.JPG" 
+                  alt="Elijah Hendon" 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-black dark:text-white mb-2 group-hover:text-[#e6bf00] transition-colors duration-300">Sufyaan Bhimani</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 font-medium">sufyaan.bhimani@franklinsabers.org</p>
+                <h3 className="text-2xl font-bold text-black dark:text-white mb-2 group-hover:text-[#e6bf00] transition-colors duration-300">Elijah Hendon</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 font-medium">elijah.hendon@franklinsabers.org</p>
                 
                 <div className="space-y-3 mb-4">
                   <div>
                     <p className="text-xs font-bold text-[#b3a169] dark:text-[#e6bf00] mb-2 uppercase tracking-wide">Specializations</p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">On-Screen Talent, Writing, Producing, Creative Work</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">Video, Photography, Technical Work</p>
                   </div>
                   <div>
                     <p className="text-xs font-bold text-[#b3a169] dark:text-[#e6bf00] mb-2 uppercase tracking-wide">Skills</p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">Short Film, Commercial, Directing, Marketing</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">Lighting, Audio, Editing, Writing, Producing, News, Feature, Short Film, Commercial, Music Video, PSA, Interview, Directing, Coordinating, Social Media</p>
                   </div>
                 </div>
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "My name is Sufyaan Bhimani. I've been in a lot of films in Saber Roar, one of my favorite films that I've acted in is Bowling with punishments. I am a very creative person and I can think of many ideas on spot."
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Lilyana Bullamore */}
-            <div className="group relative bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-[#e6bf00] hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 transform">
-              <div className="relative h-80 overflow-hidden">
-                <img 
-                  src="/Lilyana.JPG" 
-                  alt="Lilyana Bullamore" 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              </div>
-              <div className="p-6">
-                <h3 className="text-2xl font-bold text-black dark:text-white mb-2 group-hover:text-[#e6bf00] transition-colors duration-300">Lilyana Bullamore</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 font-medium">lilyana.bullamore@franklinsabers.org</p>
-                
-                <div className="space-y-3 mb-4">
-                  <div>
-                    <p className="text-xs font-bold text-[#b3a169] dark:text-[#e6bf00] mb-2 uppercase tracking-wide">Specializations</p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">Video, Photography, Technical Work, Writing, Producing, Creative Work</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-[#b3a169] dark:text-[#e6bf00] mb-2 uppercase tracking-wide">Skills</p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">Short Film, Arts & Culture, Directing, Coordinating, Social Media, Marketing</p>
-                  </div>
-                </div>
-                
-                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed">
-                    "I've worked on a variety of projects and in different roles. My favorite things to make are short films and interviews, whether I'm behind the camera or in front of it. Outside of school, I enjoy doing photography in my free time."
+                    "I'm definitely the obsessor of the saber roar. I have directed most of the segments I'm in and have edited EVERY single project I'm in."
                   </p>
                 </div>
               </div>
